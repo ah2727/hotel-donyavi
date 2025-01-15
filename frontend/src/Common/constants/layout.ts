@@ -19,8 +19,8 @@ enum LAYOUT_MODE_TYPES {
 }
 
 enum LAYOUT_DIRECTION {
-  LTR = "ltr",
   RTL = "rtl",
+  LTR = "ltr",
 }
 
 enum LAYOUT_CONTENT_WIDTH {

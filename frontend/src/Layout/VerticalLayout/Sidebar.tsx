@@ -10,7 +10,6 @@ import { Link } from 'react-router-dom';
 import VerticalLayout from "./Index";
 import withRouter from 'Common/withRouter';
 import SimpleBar from 'simplebar-react';
-import HorizontalLayout from 'Layout/HorizontalLayout';
 
 const Sidebar = ({ layoutType, layoutSidebarSizeType }: any) => {
     return (
@@ -38,7 +37,7 @@ const Sidebar = ({ layoutType, layoutSidebarSizeType }: any) => {
                     </button>
                 </div>
 
-                {layoutType === "vertical" && layoutSidebarSizeType !== "sm" ? (
+
                     <SimpleBar id="scrollbar" className="group-data-[sidebar-size=md]:max-h-[calc(100vh_-_theme('spacing.header')_*_1.2)] group-data-[sidebar-size=lg]:max-h-[calc(100vh_-_theme('spacing.header')_*_1.2)] group-data-[layout=horizontal]:h-56 group-data-[layout=horizontal]:md:h-auto group-data-[layout=horizontal]:overflow-auto group-data-[layout=horizontal]:md:overflow-visible group-data-[layout=horizontal]:max-w-screen-2xl group-data-[layout=horizontal]:mx-auto">
                         <div>
                             <ul className="group-data-[layout=horizontal]:flex group-data-[layout=horizontal]:flex-col group-data-[layout=horizontal]:md:flex-row" id="navbar-nav">
@@ -46,15 +45,7 @@ const Sidebar = ({ layoutType, layoutSidebarSizeType }: any) => {
                             </ul>
                         </div>
                     </SimpleBar>
-                ) : (
-                    <div id="scrollbar" className="group-data-[sidebar-size=md]:max-h-[calc(100vh_-_theme('spacing.header')_*_1.2)] group-data-[sidebar-size=lg]:max-h-[calc(100vh_-_theme('spacing.header')_*_1.2)] group-data-[layout=horizontal]:h-56 group-data-[layout=horizontal]:md:h-auto group-data-[layout=horizontal]:overflow-auto group-data-[layout=horizontal]:md:overflow-visible group-data-[layout=horizontal]:max-w-screen-2xl group-data-[layout=horizontal]:mx-auto">
-                        <div>
-                            <ul className="group-data-[layout=horizontal]:flex group-data-[layout=horizontal]:flex-col group-data-[layout=horizontal]:md:flex-row" id="navbar-nav">
-                                <HorizontalLayout />
-                            </ul>
-                        </div>
-                    </div>
-                )}
+
             </div>
 
             <div id="sidebar-overlay" className="absolute inset-0 z-[1002] bg-slate-500/30 hidden"></div>

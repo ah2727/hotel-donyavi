@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ChevronsLeft, ChevronsRight, Gem, LogOut, Mail, MessagesSquare, Search, Settings, ShoppingCart, User2 } from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, Gem, LogOut, Mail, MessagesSquare, Search, Settings, User2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -8,16 +8,13 @@ import { createSelector } from 'reselect';
 import userProfile from "assets/images/users/user-profile.png";
 import logoSm from "assets/images/logo-sm.png";
 import logoDark from "assets/images/logo-dark.png";
-import logoLight from "assets/images/logo-light.png";
 
 //import components
-import LanguageDropdown from 'Common/LanguageDropdown';
-import LightDark from 'Common/LightDark';
 import NotificationDropdown from 'Common/NotificationDropdown';
 import { Dropdown } from 'Common/Components/Dropdown';
 import { changeLeftsidebarSizeType } from 'slices/thunk';
 
-const Header = ({ handleToggleDrawer, handleDrawer }: any) => {
+const Header = () => {
 
     const dispatch = useDispatch<any>();
 
@@ -144,9 +141,7 @@ const Header = ({ handleToggleDrawer, handleDrawer }: any) => {
                                     <span className="group-data-[topbar=dark]:hidden group-data-[topbar=brand]:hidden">
                                         <img src={logoSm} alt="" className="h-6 mx-auto" />
                                     </span>
-                                    <span className="group-data-[topbar=dark]:block group-data-[topbar=brand]:block">
-                                        <img src={logoLight} alt="" className="h-6 mx-auto" />
-                                    </span>
+
                                 </Link>
                             </div>
 
@@ -165,28 +160,12 @@ const Header = ({ handleToggleDrawer, handleDrawer }: any) => {
 
                             <div className="flex gap-3 ms-auto">
 
-                                {/* LanguageDropdown */}
-                                <LanguageDropdown />
-
-                                {/* LightDark */}
-                                <LightDark />
-
-                                {/* AddToCartDrawer */}
-                                <div className="relative flex items-center h-header">
-                                    <button type="button" data-drawer-target="cartSidePenal" className="inline-flex relative justify-center items-center p-0 text-topbar-item transition-all size-[37.5px] duration-200 ease-linear bg-topbar rounded-md btn hover:bg-topbar-item-bg-hover hover:text-topbar-item-hover group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=dark]:dark:hover:text-zink-50 group-data-[topbar=dark]:dark:text-zink-200 group-data-[topbar=dark]:text-topbar-item-dark" onClick={handleDrawer}>
-                                        <ShoppingCart className="inline-block size-5 stroke-1 fill-slate-100 group-data-[topbar=dark]:fill-topbar-item-bg-hover-dark group-data-[topbar=brand]:fill-topbar-item-bg-hover-brand"></ShoppingCart>
-                                        <span className="absolute flex items-center justify-center w-[16px] h-[16px] text-xs text-white bg-red-400 border-white rounded-full -top-1 -right-1">3</span>
-                                    </button>
-                                </div>
+             
 
                                 {/* NotificationDropdown */}
                                 <NotificationDropdown />
 
-                                <div className="relative items-center hidden h-header md:flex">
-                                    <button onClick={handleToggleDrawer} data-drawer-target="customizerButton" type="button" className="inline-flex justify-center items-center p-0 text-topbar-item transition-all size-[37.5px] duration-200 ease-linear bg-topbar group-data-[topbar=dark]:text-topbar-item-dark rounded-md btn hover:bg-topbar-item-bg-hover hover:text-topbar-item-hover group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=dark]:dark:hover:text-zink-50 group-data-[topbar=dark]:dark:text-zink-200">
-                                        <Settings className="inline-block size-5 stroke-1 fill-slate-100 group-data-[topbar=dark]:fill-topbar-item-bg-hover-dark group-data-[topbar=brand]:fill-topbar-item-bg-hover-brand"></Settings>
-                                    </button>
-                                </div>
+          
 
                                 <Dropdown className="relative flex items-center h-header">
                                     <Dropdown.Trigger type="button" className="inline-block p-0 transition-all duration-200 ease-linear bg-topbar rounded-full text-topbar-item dropdown-toggle btn hover:bg-topbar-item-bg-hover hover:text-topbar-item-hover group-data-[topbar=dark]:text-topbar-item-dark group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=dark]:dark:hover:text-zink-50 group-data-[topbar=dark]:dark:text-zink-200" id="dropdownMenuButton" data-bs-toggle="dropdown">

@@ -5,8 +5,6 @@ import Footer from './Footer';
 import RightSidebar from './RightSidebar';
 import { createSelector } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
-import { Settings } from 'lucide-react';
-import CartDrawer from 'Common/CartDrawer';
 
 import {
   changeLayout,
@@ -116,7 +114,7 @@ const Layout = ({ children }: any) => {
     <>
       <div className="group-data-[sidebar-size=sm]:min-h-sm group-data-[sidebar-size=sm]:relative">
         <Sidebar layoutType={layoutType} layoutSidebarSizeType={layoutSidebarSizeType} />
-        <Header handleToggleDrawer={handleToggleDrawer} handleDrawer={handleDrawer} />
+        <Header  />
         <div className='relative min-h-screen group-data-[sidebar-size=sm]:min-h-sm'>
           <div className="group-data-[sidebar-size=lg]:ltr:md:ml-vertical-menu group-data-[sidebar-size=lg]:rtl:md:mr-vertical-menu group-data-[sidebar-size=md]:ltr:ml-vertical-menu-md group-data-[sidebar-size=md]:rtl:mr-vertical-menu-md group-data-[sidebar-size=sm]:ltr:ml-vertical-menu-sm group-data-[sidebar-size=sm]:rtl:mr-vertical-menu-sm pt-[calc(theme('spacing.header')_*_1)] pb-[calc(theme('spacing.header')_*_0.8)] px-4 group-data-[navbar=bordered]:pt-[calc(theme('spacing.header')_*_1.3)] group-data-[navbar=hidden]:pt-0 group-data-[layout=horizontal]:mx-auto group-data-[layout=horizontal]:max-w-screen-2xl group-data-[layout=horizontal]:px-0 group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:ltr:md:ml-auto group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:rtl:md:mr-auto group-data-[layout=horizontal]:md:pt-[calc(theme('spacing.header')_*_1.8)] group-data-[layout=horizontal]:px-3 group-data-[layout=horizontal]:group-data-[navbar=hidden]:pt-[calc(theme('spacing.header')_*_0.9)]">
             <div className='container-fluid group-data-[content=boxed]:max-w-boxed mx-auto'>
@@ -126,13 +124,9 @@ const Layout = ({ children }: any) => {
           <Footer />
         </div>
       </div>
-      {layoutNavigationType === "hidden" && <div className="fixed items-center bottom-6 right-12 h-header group-data-[navbar=hidden]:flex">
-        <button type="button" className="inline-flex items-center justify-center size-12 p-0 transition-all duration-200 ease-linear rounded-md shadow-lg text-sky-50 bg-sky-500" onClick={handleToggleDrawer}>
-          <Settings className="inline-block size-5" />
-        </button>
-      </div>}
+
       <RightSidebar isOpen={isOpen} handleToggleDrawer={handleToggleDrawer} />
-      <CartDrawer show={show} handleDrawer={handleDrawer} />
+ 
 
     </>
   );
