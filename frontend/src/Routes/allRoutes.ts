@@ -5,8 +5,6 @@ import Email from "pages/Dashboards/Email";
 import HRDashboard from "pages/Dashboards/HR";
 import SocialMediaDashboard from "pages/Dashboards/SocialMedia";
 
-// Chat
-import Chat from "pages/Chat";
 
 // Email
 import Mailbox from "pages/Email";
@@ -16,16 +14,6 @@ import DefaultCalendar from "pages/Calendar/Default";
 import MonthGrid from "pages/Calendar/MonthGrid";
 import MultiMonthStack from "pages/Calendar/MultiMonthStack";
 
-// Ecommerce
-import ListView from "pages/Ecommerce/Products/ListView";
-import GridView from "pages/Ecommerce/Products/GridView";
-import Overview from "pages/Ecommerce/Products/Overview";
-import AddNew from "pages/Ecommerce/Products/AddNew";
-import ShoppingCart from "pages/Ecommerce/ShoppingCart";
-import Checkout from "pages/Ecommerce/Checkout";
-import Orders from "pages/Ecommerce/Orders";
-import OrderOverview from "pages/Ecommerce/OrderOverview";
-import Sellers from "pages/Ecommerce/Sellers";
 
 // HR Management
 import EmployeeList from "pages/HRManagement/EmployeeList";
@@ -47,11 +35,6 @@ import CreatePayslip from "pages/HRManagement/Payroll/CreatePayslip";
 // Notes
 import Notes from "pages/Notes";
 
-// Social Media
-import Friends from "pages/SocialMedia/Friends";
-import Event from "pages/SocialMedia/Event";
-import WatchVideo from "pages/SocialMedia/WatchVideo";
-import Marketplace from "pages/SocialMedia/Marketplace";
 
 // Invoices
 import InvoiceListView from "pages/Invoices/ListView";
@@ -256,8 +239,6 @@ const authProtectedRoutes: Array<RouteObject> = [
 
 
  
-  // Chat
-  { path: "/apps-chat", component: Chat },
 
   // Mailbox
   { path: "/apps-mailbox", component: Mailbox },
@@ -267,16 +248,6 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/apps-calendar-month-grid", component: MonthGrid },
   { path: "/apps-calendar-multi-month-stack", component: MultiMonthStack },
 
-  // Ecommerce
-  { path: "/apps-ecommerce-product-list", component: ListView },
-  { path: "/apps-ecommerce-product-grid", component: GridView },
-  { path: "/apps-ecommerce-product-overview", component: Overview },
-  { path: "/apps-ecommerce-product-create", component: AddNew },
-  { path: "/apps-ecommerce-cart", component: ShoppingCart },
-  { path: "/apps-ecommerce-checkout", component: Checkout },
-  { path: "/apps-ecommerce-orders", component: Orders },
-  { path: "/apps-ecommerce-order-overview", component: OrderOverview },
-  { path: "/apps-ecommerce-sellers", component: Sellers },
 
   // HR Management
   { path: "/apps-hr-employee", component: EmployeeList },
@@ -298,11 +269,6 @@ const authProtectedRoutes: Array<RouteObject> = [
   // Notes
   { path: "/apps-notes", component: Notes },
 
-  // Social Media
-  { path: "/apps-social-friends", component: Friends },
-  { path: "/apps-social-event", component: Event },
-  { path: "/apps-social-video", component: WatchVideo },
-  { path: "/apps-social-marketplace", component: Marketplace },
 
   // Invoices
   { path: "/apps-invoice-list", component: InvoiceListView },
