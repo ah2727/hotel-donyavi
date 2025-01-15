@@ -12,7 +12,7 @@ import TopSellingProducts from "./TopSellingProducts";
 import Audience from "./Audience";
 import { useNavigate } from "react-router-dom";
 
-const Ecommerce = () => {
+const MainPage = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Wrap the navigation logic in a function
@@ -25,7 +25,7 @@ const Ecommerce = () => {
 
   return (
     <React.Fragment>
-      <BreadCrumb title="Ecommerce" pageTitle="Dashboards" />
+      <BreadCrumb title="صفحه اصلی" pageTitle="داشبورد" />
       <div className="grid grid-cols-12 gap-x-5">
         <WelcomeWidget />
         <OrderStatistics />
@@ -42,4 +42,4 @@ const Ecommerce = () => {
   );
 };
 
-export default Ecommerce;
+export default MainPage;
