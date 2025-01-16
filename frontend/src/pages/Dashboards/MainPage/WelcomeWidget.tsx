@@ -155,9 +155,7 @@ const WelcomeWidget = () => {
                             <p className="mb-5 text-slate-400">این پنل برای تعمیر و نگهداری تجهیزات هتل طراحی شده</p>
                             <button type="button" className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-500/20 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-500/20 dark:ring-custom-400/20">Take a Product</button>
                         </div>
-                        <div className="hidden col-span-12 2xl:col-span-3 lg:col-span-2 lg:col-start-11 2xl:col-start-10 lg:block">
-                            <img src={dashboard} alt="" className="h-40 ltr:2xl:ml-auto rtl:2xl:mr-auto" />
-                        </div>
+
                     </div>
                 </div>
             </div>

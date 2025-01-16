@@ -1,9 +1,6 @@
 // dashboard
-import Analytics from "pages/Dashboards/Analytics";
 import MainPage from "pages/Dashboards/MainPage";
-import Email from "pages/Dashboards/Email";
-import HRDashboard from "pages/Dashboards/HR";
-import SocialMediaDashboard from "pages/Dashboards/SocialMedia";
+
 
 
 // Create Password
@@ -29,10 +26,6 @@ const authProtectedRoutes: Array<RouteObject> = [
   // Dashboard
   { path: "/", component: MainPage },
   { path: "/dashboard", component: MainPage },
-  { path: "/dashboards-analytics", component: Analytics },
-  { path: "/dashboards-email", component: Email },
-  { path: "/dashboards-hr", component: HRDashboard },
-  { path: "/dashboards-social", component: SocialMediaDashboard },
 
   
   // profile
