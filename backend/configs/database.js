@@ -9,4 +9,4 @@ const sequelize = new Sequelize('hotel', process.env.DB_USER, process.env.DB_PAS
 
 
 
-export default sequelize;
+module.exports = sequelize;
