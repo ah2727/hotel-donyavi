@@ -6,3 +6,7 @@ const sequelize = new Sequelize('hotel', process.env.DB_USER, process.env.DB_PAS
   host: 'localhost',
   dialect: "mysql"
 });
+
+
+
+export default sequelize;
