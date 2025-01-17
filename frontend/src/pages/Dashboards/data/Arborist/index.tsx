@@ -1,8 +1,14 @@
+import React from "react";
 
 
 
 const Arborist = () => {
 
-    return(<></>)
+    return(
+    <React.Fragment>
+
+        
+    </React.Fragment>
+    )
 }
 export default Arborist;

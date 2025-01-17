@@ -82,33 +82,28 @@ const menuData: any = [
             {
                 id: 'analyticsdashboard',
                 label: 'ارجاع دستور کار',
-                link: '/dashboards-analytics',
+                link: '/WorkOrder',
                 parentId: "proccess"
             },
             {
                 id: 'ecommercedashboard',
                 label: 'اعلام خرابی',
-                link: '/dashboard',
+                link: '/failure',
                 parentId: "proccess"
             },
             {
                 id: 'emaildashboard',
                 label: 'تعریف سرویس دوره ای',
-                link: '/dashboards-email',
+                link: '/Periodicservice',
                 parentId: "proccess"
             },
             {
                 id: 'hrdashboard',
                 label: 'انجام تعمیرات',
-                link: '/dashboards-hr',
+                link: '/makerepairs',
                 parentId: "proccess"
             },
-            {
-                id: 'socialdashboard',
-                label: 'کاربران',
-                link: '/dashboards-social',
-                parentId: "proccess"
-            },
+
         ]
     },
     {
@@ -120,13 +115,13 @@ const menuData: any = [
             {
                 id: 'analyticsdashboard',
                 label: 'تعمیرات',
-                link: '/dashboards-analytics',
+                link: '/RepairLog',
                 parentId: "history"
             },
             {
                 id: 'ecommercedashboard',
                 label: 'سرویس های دوره ای',
-                link: '/dashboard',
+                link: '/PeriodicServiceLog',
                 parentId: "history"
             },
             {

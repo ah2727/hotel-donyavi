@@ -9,6 +9,12 @@ import Typeofchange from "pages/Dashboards/data/Typeofchange";
 import TypeEquipment from "pages/Dashboards/data/TypeEquipment";
 import TypeDevice from "pages/Dashboards/data/TypeDevice";
 import Users from "pages/Dashboards/data/user/user";
+import WorkOrder from "pages/Dashboards/proccess/WorkOrder";
+import FailureNotification from "pages/Dashboards/proccess/FailureNotification";
+import Periodicservice from "pages/Dashboards/proccess/Periodicservice";
+import MakeRepairs from "pages/Dashboards/proccess/MakeRepairs";
+import RepairLog from "pages/Dashboards/loghistory/Repairs";
+import PeriodicServiceLog from "pages/Dashboards/loghistory/PeriodicServiceLog";
 // Create Password
 import BasicCreatePassword from "pages/AuthenticationInner/CreatePassword/Basic";
 import CreatePasswordModern from "pages/AuthenticationInner/CreatePassword/CreatePasswordModern";
@@ -40,7 +46,12 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/TypeEquipment", component: TypeEquipment },
   { path: "/TypeDevice", component: TypeDevice },
   { path: "/users", component: Users },
-
+  { path: "/workorder", component: WorkOrder },
+  { path: "/failure", component: FailureNotification },
+  { path: "/Periodicservice", component: Periodicservice },
+  { path: "/makerepairs", component: MakeRepairs },
+  { path: "/RepairLog", component: RepairLog },
+  { path: "/PeriodicServiceLog", component: PeriodicServiceLog },
   // profile
   { path: "/user-profile", component: UserProfile },
 ];
