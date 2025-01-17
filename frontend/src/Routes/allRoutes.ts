@@ -1,6 +1,7 @@
 // dashboard
 import MainPage from "pages/Dashboards/MainPage";
 import Arborist from "pages/Dashboards/data/Arborist";
+import DefinEquipment from "pages/Dashboards/data/DefineEquipment";
 import Persons from "pages/Dashboards/data/persons";
 import Places from "pages/Dashboards/data/places";
 import TechnicalWarehouse from "pages/Dashboards/data/Technicalwarehouse";
@@ -41,6 +42,7 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/", component: MainPage },
   { path: "/dashboard", component: MainPage },
   { path: "/arborist", component: Arborist },
+  { path: "/DefinEquipment", component: DefinEquipment },
   { path: "/persons", component: Persons },
   { path: "/places", component: Places },
   { path: "/Technicalwarehouse", component: TechnicalWarehouse },
