@@ -1,8 +1,8 @@
 // dashboard
 import MainPage from "pages/Dashboards/MainPage";
 import Arborist from "pages/Dashboards/Arborist";
-
-
+import Persons from "pages/Dashboards/persons";
+import Places from "pages/Dashboards/places";
 // Create Password
 import BasicCreatePassword from "pages/AuthenticationInner/CreatePassword/Basic";
 import CreatePasswordModern from "pages/AuthenticationInner/CreatePassword/CreatePasswordModern";
@@ -15,7 +15,6 @@ import Register from "pages/Authentication/Register";
 import UserProfile from "pages/Authentication/UserProfile";
 import Offline from "pages/AuthenticationInner/Offline";
 
-
 interface RouteObject {
   path: string;
   component: React.ComponentType<any>; // Use React.ComponentType to specify the type of the component
@@ -27,20 +26,20 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/", component: MainPage },
   { path: "/dashboard", component: MainPage },
   { path: "/arborist", component: Arborist },
+  { path: "/persons", component: Persons },
+  { path: "/places", component: Places },
 
-  
   // profile
   { path: "/user-profile", component: UserProfile },
 ];
 
 const publicRoutes = [
   // Landing
- 
+
   { path: "/auth-create-password-basic", component: BasicCreatePassword },
   { path: "/auth-create-password-cover", component: CreatePasswordCover },
   { path: "/auth-create-password-boxed", component: CreatePasswordBoxed },
   { path: "/auth-create-password-modern", component: CreatePasswordModern },
-
 
   // Error
   { path: "/pages-offline", component: Offline },
@@ -48,12 +47,10 @@ const publicRoutes = [
 
   // Maintenance
 
-
   // authentication
   { path: "/login", component: Login },
   { path: "/logout", component: Logout },
   { path: "/register", component: Register },
-
-]
+];
 
 export { authProtectedRoutes, publicRoutes };

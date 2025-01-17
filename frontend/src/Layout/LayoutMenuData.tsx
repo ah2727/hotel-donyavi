@@ -26,13 +26,13 @@ const menuData: any = [
             {
                 id: 'ecommercedashboard',
                 label: 'اشخاص',
-                link: '/dashboard',
+                link: '/persons',
                 parentId: "data"
             },
             {
                 id: 'emaildashboard',
                 label: 'مکان ها',
-                link: '/dashboards-email',
+                link: '/places',
                 parentId: "data"
             },
             {
