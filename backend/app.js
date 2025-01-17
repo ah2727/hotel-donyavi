@@ -2,13 +2,14 @@ const { sequelize} = require('./models');
 const equipmentRoutes = require('./routes/Equipment');
 const personRoutes = require('./routes/persons')
 const deviceRoutes = require('./routes/device');
+const cors = require("cors");
 
 const express = require('express');
 const bodyParser = require('body-parser');
-sequelize.sync({alter:true})
+// sequelize.sync({alter:true})
 const app = express();
 const PORT = 3000;
-
+app.use(cors());
 // Middleware
 app.use(bodyParser.json()); // Parse JSON request bodies
 
