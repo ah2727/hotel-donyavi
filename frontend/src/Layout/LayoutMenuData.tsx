@@ -62,13 +62,13 @@ const menuData: any = [
             {
                 id: 'hrdashboard',
                 label: 'نوع دستگاه',
-                link: '/dashboards-hr',
+                link: '/TypeDevice',
                 parentId: "data"
             },
             {
                 id: 'hrdashboard',
                 label: 'کاربران',
-                link: '/dashboards-hr',
+                link: '/users',
                 parentId: "data"
             },
         ]

@@ -7,6 +7,8 @@ import TechnicalWarehouse from "pages/Dashboards/Technicalwarehouse";
 import DEquipment from "pages/Dashboards/DEquipment";
 import Typeofchange from "pages/Dashboards/Typeofchange";
 import TypeEquipment from "pages/Dashboards/TypeEquipment";
+import TypeDevice from "pages/Dashboards/TypeDevice";
+import Users from "pages/Dashboards/user/user";
 // Create Password
 import BasicCreatePassword from "pages/AuthenticationInner/CreatePassword/Basic";
 import CreatePasswordModern from "pages/AuthenticationInner/CreatePassword/CreatePasswordModern";
@@ -36,6 +38,8 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/DEquipment", component: DEquipment },
   { path: "/Typeofchange", component: Typeofchange },
   { path: "/TypeEquipment", component: TypeEquipment },
+  { path: "/TypeDevice", component: TypeDevice },
+  { path: "/users", component: Users },
 
   // profile
   { path: "/user-profile", component: UserProfile },
