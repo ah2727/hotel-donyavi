@@ -1,14 +1,14 @@
 // dashboard
 import MainPage from "pages/Dashboards/MainPage";
-import Arborist from "pages/Dashboards/Arborist";
-import Persons from "pages/Dashboards/persons";
-import Places from "pages/Dashboards/places";
-import TechnicalWarehouse from "pages/Dashboards/Technicalwarehouse";
-import DEquipment from "pages/Dashboards/DEquipment";
-import Typeofchange from "pages/Dashboards/Typeofchange";
-import TypeEquipment from "pages/Dashboards/TypeEquipment";
-import TypeDevice from "pages/Dashboards/TypeDevice";
-import Users from "pages/Dashboards/user/user";
+import Arborist from "pages/Dashboards/data/Arborist";
+import Persons from "pages/Dashboards/data/persons";
+import Places from "pages/Dashboards/data/places";
+import TechnicalWarehouse from "pages/Dashboards/data/Technicalwarehouse";
+import DEquipment from "pages/Dashboards/data/DEquipment";
+import Typeofchange from "pages/Dashboards/data/Typeofchange";
+import TypeEquipment from "pages/Dashboards/data/TypeEquipment";
+import TypeDevice from "pages/Dashboards/data/TypeDevice";
+import Users from "pages/Dashboards/data/user/user";
 // Create Password
 import BasicCreatePassword from "pages/AuthenticationInner/CreatePassword/Basic";
 import CreatePasswordModern from "pages/AuthenticationInner/CreatePassword/CreatePasswordModern";
