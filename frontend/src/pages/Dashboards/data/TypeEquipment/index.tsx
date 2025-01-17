@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const TypeEquipment = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
+export interface column {
+  header: string;
+  accessorKey: string;
+  enableColumnFilter: boolean;
+  enableSorting: boolean;
+}
 
+const TypeEquipment = () => {
+  const [equipmentTypes, setEquipmentTypes] = useState([]);
+
+  const API_URL = process.env.REACT_APP_API_URL;
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -26,7 +34,7 @@ const TypeEquipment = () => {
         `${API_URL}/equipment/equipment-types/`,
         formData
       );
-      console.log(response.data)
+      console.log(response.data);
       if (response.data) {
         // If the response status is 201 (Created), show a notification
         setNotification("نوع تجهیزات با موفقیت ساخته شد");
@@ -49,13 +57,27 @@ const TypeEquipment = () => {
       setNotification("");
     }, 3000);
   };
+  const fetchEquipmentTypes = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/equipment/equipment-types"
+      ); // Adjust the URL if necessary
+      console.log("Response Data:", response.data); // Debugging
+      setEquipmentTypes(response.data); // Set the data into the state
+    } catch (err) {
+      console.error("Error fetching equipment types:", err);
+    }
+  };
+
+  // Use useEffect to fetch data when the component mounts
+  useEffect(() => {
+    fetchEquipmentTypes();
+  }, []); // Empty dependency array means this runs once when the component mounts
 
   return (
     <React.Fragment>
       {notification && (
-        <div
-        className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500"
-        >
+        <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
           {notification}
         </div>
       )}
@@ -99,6 +121,45 @@ const TypeEquipment = () => {
               </div>
             </div>
           </form>
+        </div>
+      </div>
+      <div className="card mt-2">
+        <div className="card-body">
+          <table className="w-full whitespace-nowrap">
+            <thead>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center	">
+                نام نوع تجهیزات
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center	">
+                توضیحات
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
+                عملیات
+              </th>
+            </thead>
+            <tbody className="list form-check-all">
+              {equipmentTypes.map((equipmentType: any) => (
+                <tr>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center	">
+                    {equipmentType.name}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center	">
+                    {equipmentType.description}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center	">
+                    <div className="flex gap-2 justify-center">
+                      <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
+                        آپدیت
+                      </button>
+                      <button className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                        دیلیت
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </React.Fragment>
