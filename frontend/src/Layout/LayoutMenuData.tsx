@@ -38,25 +38,25 @@ const menuData: any = [
             {
                 id: 'hrdashboard',
                 label: 'انبار فنی',
-                link: '/dashboards-hr',
+                link: '/Technicalwarehouse',
                 parentId: "data"
             },
             {
                 id: 'socialdashboard',
                 label: 'تعریف تجهیزات مستقر',
-                link: '/dashboards-social',
+                link: '/DEquipment',
                 parentId: "data"
             },
             {
                 id: 'emaildashboard',
                 label: 'نوع تغییر',
-                link: '/dashboards-email',
+                link: '/Typeofchange',
                 parentId: "data"
             },
             {
                 id: 'hrdashboard',
                 label: 'نوع تجهیزات',
-                link: '/dashboards-hr',
+                link: '/TypeEquipment',
                 parentId: "data"
             },
             {

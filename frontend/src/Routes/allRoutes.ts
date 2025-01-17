@@ -3,6 +3,10 @@ import MainPage from "pages/Dashboards/MainPage";
 import Arborist from "pages/Dashboards/Arborist";
 import Persons from "pages/Dashboards/persons";
 import Places from "pages/Dashboards/places";
+import TechnicalWarehouse from "pages/Dashboards/Technicalwarehouse";
+import DEquipment from "pages/Dashboards/DEquipment";
+import Typeofchange from "pages/Dashboards/Typeofchange";
+import TypeEquipment from "pages/Dashboards/TypeEquipment";
 // Create Password
 import BasicCreatePassword from "pages/AuthenticationInner/CreatePassword/Basic";
 import CreatePasswordModern from "pages/AuthenticationInner/CreatePassword/CreatePasswordModern";
@@ -28,6 +32,10 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/arborist", component: Arborist },
   { path: "/persons", component: Persons },
   { path: "/places", component: Places },
+  { path: "/Technicalwarehouse", component: TechnicalWarehouse },
+  { path: "/DEquipment", component: DEquipment },
+  { path: "/Typeofchange", component: Typeofchange },
+  { path: "/TypeEquipment", component: TypeEquipment },
 
   // profile
   { path: "/user-profile", component: UserProfile },
