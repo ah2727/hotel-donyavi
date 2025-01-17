@@ -1,5 +1,6 @@
 const { sequelize} = require('./models');
 const equipmentRoutes = require('./routes/Equipment');
+const personRoutes = require('./routes/persons')
 const express = require('express');
 const bodyParser = require('body-parser');
 // sequelize.sync()
@@ -15,6 +16,7 @@ app.use(bodyParser.json()); // Parse JSON request bodies
 
 // API routes
 app.use('/equipment', equipmentRoutes);
+app.use('/persons', personRoutes);
 
 
 
