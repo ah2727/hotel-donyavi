@@ -1,6 +1,6 @@
 // dashboard
 import MainPage from "pages/Dashboards/MainPage";
-
+import Arborist from "pages/Dashboards/Arborist";
 
 
 // Create Password
@@ -26,6 +26,7 @@ const authProtectedRoutes: Array<RouteObject> = [
   // Dashboard
   { path: "/", component: MainPage },
   { path: "/dashboard", component: MainPage },
+  { path: "/arborist", component: Arborist },
 
   
   // profile

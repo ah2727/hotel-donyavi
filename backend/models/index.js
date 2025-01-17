@@ -7,6 +7,13 @@ const Permission = require("./permission")(sequelize);
 const UserPermission = require("./userPermission")(sequelize);
 const EquipmentType = require("./EquipmentType"); // Import EquipmentType for association
 const Equipment = require("./Equipment"); // Import Equipment for association
+const Person = require('./persons')
+
+
+
+const PersonModel = Person(sequelize); // Pass sequelize instance to the model
+
+
 // Setup associations
 User.belongsToMany(Permission, {
   through: UserPermission,
@@ -34,4 +41,5 @@ module.exports = {
   User,
   Permission,
   UserPermission,
+  Person
 };

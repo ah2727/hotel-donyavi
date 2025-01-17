@@ -20,7 +20,7 @@ const menuData: any = [
             {
                 id: 'analyticsdashboard',
                 label: 'تجهیزات (نمودار درختی)',
-                link: '/dashboards-analytics',
+                link: '/arborist',
                 parentId: "data"
             },
             {
