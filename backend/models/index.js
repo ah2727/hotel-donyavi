@@ -1,6 +1,6 @@
 const { Sequelize } = require("sequelize");
 const sequelize = require("../configs/database");
-
+const Device = require("./device"); 
 // Import models
 const User = require("./users")(sequelize);
 const Permission = require("./permission")(sequelize);
@@ -35,11 +35,23 @@ EquipmentType.hasMany(Equipment, {
   foreignKey: "equipmentTypeId",
   as: "equipments",
 });
+
+// Define the association between Equipment and Device
+// Relationships
+Equipment.hasMany(Device, {
+  foreignKey: "equipmentId", // Foreign key in Device
+  as: "devices", // Alias for accessing related Devices
+});
+Device.belongsTo(Equipment, {
+  foreignKey: "equipmentId", // Foreign key in Device
+  as: "equipment", // Alias for accessing the related Equipment
+});
 // Export models and sequelize instance
 module.exports = {
   sequelize,
   User,
   Permission,
   UserPermission,
-  Person
+  Person,
+  Device
 };
