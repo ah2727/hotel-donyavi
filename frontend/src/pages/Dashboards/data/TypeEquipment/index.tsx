@@ -8,7 +8,7 @@ const TypeEquipment = () => {
     name: "",
     description: "",
   });
-  const [message, setMessage] = useState("");
+  const [notification, setNotification] = useState(""); // State to store the notification message
 
   // Handle form input changes
   const handleChange = (e: any) => {
@@ -23,19 +23,42 @@ const TypeEquipment = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${API_URL}/equipment/equipment-types`,
+        `${API_URL}/equipment/equipment-types/`,
         formData
       );
-      setMessage("Equipment Type created successfully!");
-      console.log("Response:", response.data);
+      console.log(response.data)
+      if (response.data) {
+        // If the response status is 201 (Created), show a notification
+        setNotification("نوع تجهیزات با موفقیت ساخته شد");
+      } else {
+        setNotification("یک ارور ناشناخته از سرور.");
+      }
     } catch (error) {
-      setMessage("Error creating Equipment Type. Please try again.");
+      setNotification("Error creating Equipment Type. Please try again.");
       console.error("Error:", error);
     }
+
+    // Clear the form after submission
+    setFormData({
+      name: "",
+      description: "",
+    });
+
+    // Automatically hide the notification after 3 seconds
+    setTimeout(() => {
+      setNotification("");
+    }, 3000);
   };
 
   return (
     <React.Fragment>
+      {notification && (
+        <div
+        className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500"
+        >
+          {notification}
+        </div>
+      )}
       <div className="card mt-10">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
