@@ -13,8 +13,11 @@ import WorkOrder from "pages/Dashboards/proccess/WorkOrder";
 import FailureNotification from "pages/Dashboards/proccess/FailureNotification";
 import Periodicservice from "pages/Dashboards/proccess/Periodicservice";
 import MakeRepairs from "pages/Dashboards/proccess/MakeRepairs";
-import RepairLog from "pages/Dashboards/loghistory/Repairs";
+import RepairLog from "pages/Dashboards/loghistory/RepairsLog";
 import PeriodicServiceLog from "pages/Dashboards/loghistory/PeriodicServiceLog";
+import PersonHours from "pages/Dashboards/loghistory/Person-hoursLog";
+import EquipmentsLog from "pages/Dashboards/loghistory/EquipmentsLog";
+import warhouseInventory from "pages/Dashboards/loghistory/warehouseInventory";
 // Create Password
 import BasicCreatePassword from "pages/AuthenticationInner/CreatePassword/Basic";
 import CreatePasswordModern from "pages/AuthenticationInner/CreatePassword/CreatePasswordModern";
@@ -52,6 +55,10 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/makerepairs", component: MakeRepairs },
   { path: "/RepairLog", component: RepairLog },
   { path: "/PeriodicServiceLog", component: PeriodicServiceLog },
+  { path: "/Person-hour", component: PersonHours },
+  { path: "/EquipmentsLog", component: EquipmentsLog },
+  { path: "/warhouseInventory", component: warhouseInventory },
+
   // profile
   { path: "/user-profile", component: UserProfile },
 ];

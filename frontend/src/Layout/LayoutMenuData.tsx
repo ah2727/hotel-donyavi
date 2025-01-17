@@ -127,19 +127,19 @@ const menuData: any = [
             {
                 id: 'emaildashboard',
                 label: 'ساعت نفر کارکرد پرسنل',
-                link: '/dashboards-email',
+                link: '/Person-hour',
                 parentId: "history"
             },
             {
                 id: 'hrdashboard',
                 label: 'تجهیزات',
-                link: '/dashboards-hr',
+                link: '/EquipmentsLog',
                 parentId: "history"
             },
             {
                 id: 'socialdashboard',
                 label: 'موجودی انبار فنی',
-                link: '/dashboards-social',
+                link: '/warhouseInventory',
                 parentId: "history"
             },
         ]
