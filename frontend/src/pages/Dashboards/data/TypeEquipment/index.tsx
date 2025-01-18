@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import DeleteModal from "Common/DeleteModal";
+import { Button } from "lightbox.js-react";
 export interface column {
   header: string;
   accessorKey: string;
@@ -16,7 +17,8 @@ type Equipment = {
 };
 const TypeEquipment = () => {
   const [equipmentTypes, setEquipmentTypes] = useState<Equipment[]>([]);
-
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
+  const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
   const API_URL = process.env.REACT_APP_API_URL;
   const [formData, setFormData] = useState({
     name: "",
@@ -72,13 +74,28 @@ const TypeEquipment = () => {
       console.error("Error fetching equipment types:", err);
     }
   };
-  const deleteType = async (id:number) => {
-    await axios.delete(`${API_URL}/equipment/equipment-types/${id}`,)
+  const openModal = (id: number) => {
+    setSelectedId(id);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsModalOpen(false);
+  };
+  const deleteType = async () => {
+    if (selectedId === null) return;
+
+    await axios.delete(`${API_URL}/equipment/equipment-types/${selectedId}`);
     const updatedList = equipmentTypes.filter(
-      (equipment) => equipment.id !== id
+      (equipment) => equipment.id !== selectedId
     );
-    setEquipmentTypes(updatedList)
-  }
+    setEquipmentTypes(updatedList);
+    setIsModalOpen(false);
+  };
+
+
   // Use useEffect to fetch data when the component mounts
   useEffect(() => {
     fetchEquipmentTypes();
@@ -147,6 +164,7 @@ const TypeEquipment = () => {
                 عملیات
               </th>
             </thead>
+
             <tbody className="list form-check-all">
               {equipmentTypes.map((equipmentType: any) => (
                 <tr>
@@ -161,7 +179,10 @@ const TypeEquipment = () => {
                       <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
                         آپدیت
                       </button>
-                      <button onClick={() => deleteType(equipmentType.id)} className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                      <button
+                        onClick={() => openModal(equipmentType.id)}
+                        className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
+                      >
                         حذف
                       </button>
                     </div>
@@ -171,6 +192,7 @@ const TypeEquipment = () => {
             </tbody>
           </table>
         </div>
+              <DeleteModal show={isModalOpen} onDelete={()=> deleteType()} onHide={closeModal}></DeleteModal>
       </div>
     </React.Fragment>
   );
