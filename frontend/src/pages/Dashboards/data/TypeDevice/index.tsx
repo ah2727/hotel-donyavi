@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import DeleteModal from "Common/DeleteModal";
 
 export type DeviceType = {
   id: number; // Primary key, auto-incremented
@@ -16,6 +17,8 @@ export type DeviceType = {
 const TypeDevice = () => {
   const [deviceTypes, setDeviceTypes] = useState<DeviceType[]>([]);
   const [notification, setNotification] = useState(""); // State to store the notification message
+  const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
   const [formData, setFormData] = useState({
     id: null, // For auto-generated IDs, you can set it to null initially
     name: "", // Initial value for the equipment name
@@ -85,7 +88,27 @@ const TypeDevice = () => {
   useEffect(() => {
     fetchDevicesTypes();
   }, []); // Empty dependency array means this runs once when the component mounts
+  const openModal = (id: number) => {
+    setSelectedId(id);
+    setIsModalOpen(true);
+  };
 
+  // Close modal
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsModalOpen(false);
+  };
+  const deleteType = async () => {
+    if (selectedId === null) return;
+
+    await axios.delete(`${API_URL}/device/devices/${selectedId}`);
+    const updatedList = deviceTypes.filter(
+      (device) => device.id !== selectedId
+    );
+    setDeviceTypes(updatedList);
+    setIsModalOpen(false);
+    setSelectedId(null);
+  };
   return (
     <React.Fragment>
       {notification && (
@@ -244,7 +267,7 @@ const TypeDevice = () => {
                       <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
                         آپدیت
                       </button>
-                      <button className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                      <button onClick={() => openModal(equipmentType.id)} className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
                         حذف
                       </button>
                     </div>
@@ -254,11 +277,11 @@ const TypeDevice = () => {
             </tbody>
           </table>
         </div>
-        {/* <DeleteModal
+        <DeleteModal
             show={isModalOpen}
             onDelete={() => deleteType()}
             onHide={closeModal}
-          ></DeleteModal> */}
+          ></DeleteModal>
       </div>
     </React.Fragment>
   );
