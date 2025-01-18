@@ -157,4 +157,4 @@ class EquipmentTypeService {
   }
 }
 
-(module.exports = EquipmentTypeService), EquipmentService;
+module.exports ={ EquipmentTypeService, EquipmentService}

@@ -108,7 +108,7 @@ const DefinEquipment = () => {
     try {
       console.log("Submitting form data:", formData);
       // Here you can send `formData` to your API
-      await axios.post(`${API_URL}/equipment`, formData);
+      await axios.post(`${API_URL}/equipment/equipment`, formData);
       alert("Equipment successfully created!");
     } catch (error) {
       console.error("Error submitting form:", error);
