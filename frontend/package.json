@@ -49,6 +49,7 @@
     "prismjs": "^1.29.0",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
+    "react-arborist": "^3.4.0",
     "react-color": "^2.19.3",
     "react-copy-to-clipboard": "^5.1.0",
     "react-countup": "^6.5.3",

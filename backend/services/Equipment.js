@@ -43,7 +43,16 @@ class EquipmentService {
   static async getAllEquipment() {
     try {
       const equipmentList = await Equipment.findAll({
-        include: ["EquipmentType"], // Include related EquipmentType if associations are defined
+        include: [
+          {
+            model: EquipmentType,
+            as: "equipmentType", // Alias must match the one defined in the association
+          },
+          {
+            model: Device,
+            as: "devices", // Alias for associated devices
+          },
+        ],
       });
       return equipmentList;
     } catch (error) {
