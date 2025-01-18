@@ -7,9 +7,15 @@ export interface column {
   enableColumnFilter: boolean;
   enableSorting: boolean;
 }
-
+type Equipment = {
+  id: number; // Represents the unique identifier
+  name: string; // Name of the equipment
+  description: string; // Description of the equipment
+  createdAt: string; // Timestamp when it was created
+  updatedAt: string; // Timestamp when it was last updated
+};
 const TypeEquipment = () => {
-  const [equipmentTypes, setEquipmentTypes] = useState([]);
+  const [equipmentTypes, setEquipmentTypes] = useState<Equipment[]>([]);
 
   const API_URL = process.env.REACT_APP_API_URL;
   const [formData, setFormData] = useState({
@@ -59,16 +65,20 @@ const TypeEquipment = () => {
   };
   const fetchEquipmentTypes = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/equipment/equipment-types"
-      ); // Adjust the URL if necessary
+      const response = await axios.get(`${API_URL}/equipment/equipment-types`); // Adjust the URL if necessary
       console.log("Response Data:", response.data); // Debugging
       setEquipmentTypes(response.data); // Set the data into the state
     } catch (err) {
       console.error("Error fetching equipment types:", err);
     }
   };
-
+  const deleteType = async (id:number) => {
+    await axios.delete(`${API_URL}/equipment/equipment-types/${id}`,)
+    const updatedList = equipmentTypes.filter(
+      (equipment) => equipment.id !== id
+    );
+    setEquipmentTypes(updatedList)
+  }
   // Use useEffect to fetch data when the component mounts
   useEffect(() => {
     fetchEquipmentTypes();
@@ -127,10 +137,10 @@ const TypeEquipment = () => {
         <div className="card-body">
           <table className="w-full whitespace-nowrap">
             <thead>
-              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center	">
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 نام نوع تجهیزات
               </th>
-              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center	">
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
                 توضیحات
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
@@ -140,19 +150,19 @@ const TypeEquipment = () => {
             <tbody className="list form-check-all">
               {equipmentTypes.map((equipmentType: any) => (
                 <tr>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center	">
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     {equipmentType.name}
                   </td>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center	">
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     {equipmentType.description}
                   </td>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center	">
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
                       <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
                         آپدیت
                       </button>
-                      <button className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
-                        دیلیت
+                      <button onClick={() => deleteType(equipmentType.id)} className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                        حذف
                       </button>
                     </div>
                   </td>
