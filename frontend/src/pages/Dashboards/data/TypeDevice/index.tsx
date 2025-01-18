@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export type DeviceType = {
@@ -38,10 +38,7 @@ const TypeDevice = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API_URL}/device/devices/`,
-        formData
-      );
+      const response = await axios.post(`${API_URL}/device/devices/`, formData);
       console.log(response.data);
       if (response.data) {
         setDeviceTypes((prevEquipmentTypes) => [
@@ -74,13 +71,28 @@ const TypeDevice = () => {
       setNotification("");
     }, 3000);
   };
+
+  const fetchDevicesTypes = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/device/devices`); // Adjust the URL if necessary
+      console.log("Response Data:", response.data); // Debugging
+      setDeviceTypes(response.data); // Set the data into the state
+    } catch (err) {
+      console.error("Error fetching equipment types:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDevicesTypes();
+  }, []); // Empty dependency array means this runs once when the component mounts
+
   return (
     <React.Fragment>
       {notification && (
-          <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
-            {notification}
-          </div>
-        )}
+        <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
+          {notification}
+        </div>
+      )}
       <div className="card mt-10">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
@@ -190,10 +202,19 @@ const TypeDevice = () => {
           <table className="w-full whitespace-nowrap">
             <thead>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                نام نوع تجهیزات
+                نام نوع وسایل
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                توضیحات
+                برند
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                مدل
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                سریال
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                وضعیت
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 عملیات
@@ -201,32 +222,35 @@ const TypeDevice = () => {
             </thead>
 
             <tbody className="list form-check-all">
-              {/* {equipmentTypes.map((equipmentType: any) => ( */}
-              <tr>
-                <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                  {/* {equipmentType.name} */}
-                </td>
-                <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                  {/* {equipmentType.description} */}
-                </td>
-                <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      // onClick={() => UpdateSet(equipmentType)}
-                      className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
-                    >
-                      آپدیت
-                    </button>
-                    <button
-                      // onClick={() => openModal(equipmentType.id)}
-                      className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
-                    >
-                      حذف
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              {/* ))} */}
+              {deviceTypes.map((equipmentType: any) => (
+                <tr>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {equipmentType.name}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {equipmentType.brand}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {equipmentType.model}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {equipmentType.serialNumber}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {equipmentType.status}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    <div className="flex gap-2 justify-center">
+                      <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
+                        آپدیت
+                      </button>
+                      <button className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                        حذف
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
