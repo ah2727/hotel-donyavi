@@ -64,7 +64,7 @@ const Arborist = () => {
           isLeaf: true, // Devices are leaf nodes
         })),
       }));
-      console.log(transformedTreeData)
+      console.log(transformedTreeData);
       // Set the transformed data as the tree structure
       setTreeData(transformedTreeData);
     } catch (error) {
@@ -103,8 +103,17 @@ const Arborist = () => {
       </div>
       <div className="card mt-2">
         <div className="card-body flex justify-center">
-         <Tree initialData={treeData}  />;
-
+          <Tree
+            data={treeData}
+            idAccessor="id"
+            childrenAccessor="children"
+            openByDefault={true}
+            width={600}
+            height={400}
+            rowHeight={30}
+          >
+            {NodeRenderer}
+          </Tree>
         </div>
       </div>
     </React.Fragment>
@@ -114,21 +123,29 @@ const Arborist = () => {
 // NodeRenderer component
 // Custom NodeRenderer component for rendering each node
 // Custom NodeRenderer component for rendering each node
+// NodeRenderer for rendering each node
 const NodeRenderer = <T extends TreeNodeType>({
   node,
   style,
 }: {
-  node: { data: T; isLeaf: boolean }; // Properly typing the node
-  style: React.CSSProperties;
+  node: { data: T; isLeaf: boolean; toggle: () => void; isOpen: boolean }; // Ensure `toggle` and `isOpen` are available
+  style: React.CSSProperties; // Inline styles for the node
 }) => {
   return (
-    <div style={style}>
+    <div
+      style={style}
+      className="cursor-pointer flex items-center"
+      onClick={() => node.toggle()} // Properly call node.toggle
+    >
       {node.isLeaf ? (
-        <span style={{ color: "blue" }}>📱 {node.data.name}</span> // Leaf node (Device)
+        <span>📱 {node.data.name}</span>
       ) : (
-        <span>🛠️ {node.data.name}</span> // Parent node (Equipment)
+        <span>
+          {node.isOpen ? "📂" : "📁"} {node.data.name}
+        </span>
       )}
     </div>
   );
 };
+
 export default Arborist;
