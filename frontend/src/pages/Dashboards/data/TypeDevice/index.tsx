@@ -3,12 +3,12 @@ import axios from "axios";
 import DeleteModal from "Common/DeleteModal";
 
 export type DeviceType = {
-  id: number; // Primary key, auto-incremented
+  id: number;
   name: string; // Name of the device (required)
   brand: string; // Brand of the device (required)
   model: string; // Model of the device (required)
-  serialNumber?: string | null; // Unique serial number (optional)
-  purchaseDate?: string | null; // Purchase date in ISO string format (optional)
+  serialNumber?: string; // Unique serial number (optional)
+  purchaseDate?: string; // Purchase date in ISO string format (optional)
   status: "active" | "inactive" | "retired"; // Enum for device status
   createdAt?: Date; // Timestamp for creation (added by Sequelize)
   updatedAt?: Date; // Timestamp for last update (added by Sequelize)
@@ -20,7 +20,6 @@ const TypeDevice = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
   const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
   const [formData, setFormData] = useState({
-    id: null, // For auto-generated IDs, you can set it to null initially
     name: "", // Initial value for the equipment name
     brand: "", // Initial value for the brand
     model: "", // Initial value for the model
@@ -60,7 +59,6 @@ const TypeDevice = () => {
 
     // Clear the form after submission
     setFormData({
-      id: null, // For auto-generated IDs, you can set it to null initially
       name: "", // Initial value for the equipment name
       brand: "", // Initial value for the brand
       model: "", // Initial value for the model
@@ -92,7 +90,17 @@ const TypeDevice = () => {
     setSelectedId(id);
     setIsModalOpen(true);
   };
-
+  const UpdateSet = (target: any) => {
+    setFormData({
+      name: target.name || "", // Ensure a fallback empty string
+      brand: target.brand || "",
+      model: target.model || "",
+      serialNumber: target.serialNumber || "", // Optional field, fallback to empty string
+      purchaseDate: target.purchaseDate || "", // Optional field, fallback to empty string
+      status: target.status as "active" | "inactive" | "retired", // Assert the type
+    });
+    setSelectedId(target.id);
+  };
   // Close modal
   const closeModal = () => {
     setSelectedId(null);
@@ -109,6 +117,57 @@ const TypeDevice = () => {
     setIsModalOpen(false);
     setSelectedId(null);
   };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
+
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/device/devices/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = deviceTypes.map((device) =>
+          device.id === selectedId
+            ? {
+                ...device,
+                ...formData,
+                status: formData.status as "active" | "inactive" | "retired", // Assert the type
+              }
+            : device
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+          name: "", // Initial value for the equipment name
+          brand: "", // Initial value for the brand
+          model: "", // Initial value for the model
+          serialNumber: "", // Optional field, defaulting to an empty string
+          purchaseDate: "", // Optional field, ISO date string (use empty string initially)
+          status: "active", // Default status value
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setDeviceTypes(updatedList);
+
+        // Optional: Show a success notification
+        setNotification("Device updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update the device:", error);
+
+      // Optional: Show an error notification
+      setNotification("Failed to update the device. Please try again.");
+    } finally {
+      // Optional: Clear notifications after 3 seconds
+      setTimeout(() => {
+        setNotification("");
+      }, 3000);
+    }
+  };
+
   return (
     <React.Fragment>
       {notification && (
@@ -122,7 +181,7 @@ const TypeDevice = () => {
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
                 <label className="inline-block mb-2 text-base font-medium">
-                  نام نوع تجهیزات:
+                  نام نوع وسایل:
                 </label>
                 <input
                   name="name"
@@ -195,26 +254,26 @@ const TypeDevice = () => {
             </div>
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
-                {/* {selectedId ? ( */}
-                <>
-                  <button
-                    type="button"
-                    // onClick={update}
-                    className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                  >
-                    آپدیت
-                  </button>
-                </>
-                {/* ) : ( */}
-                <>
-                  <button
-                    type="submit"
-                    className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                  >
-                    تایید
-                  </button>
-                </>
-                {/* )} */}
+                {selectedId ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={update}
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      آپدیت
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="submit"
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      تایید
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </form>
@@ -264,10 +323,16 @@ const TypeDevice = () => {
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
-                      <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
+                      <button
+                        onClick={() => UpdateSet(equipmentType)}
+                        className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
+                      >
                         آپدیت
                       </button>
-                      <button onClick={() => openModal(equipmentType.id)} className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                      <button
+                        onClick={() => openModal(equipmentType.id)}
+                        className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
+                      >
                         حذف
                       </button>
                     </div>
@@ -278,10 +343,10 @@ const TypeDevice = () => {
           </table>
         </div>
         <DeleteModal
-            show={isModalOpen}
-            onDelete={() => deleteType()}
-            onHide={closeModal}
-          ></DeleteModal>
+          show={isModalOpen}
+          onDelete={() => deleteType()}
+          onHide={closeModal}
+        ></DeleteModal>
       </div>
     </React.Fragment>
   );
