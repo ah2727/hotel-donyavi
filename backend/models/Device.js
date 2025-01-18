@@ -25,7 +25,7 @@ Device.init(
     serialNumber: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false,
+      allowNull: true,
     },
     purchaseDate: {
       type: DataTypes.DATE,
