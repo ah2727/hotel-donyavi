@@ -44,6 +44,10 @@ const TypeEquipment = () => {
       );
       console.log(response.data);
       if (response.data) {
+        setEquipmentTypes((prevEquipmentTypes) => [
+          ...prevEquipmentTypes,
+          response.data, // Add the newly created equipment type
+        ]);
         // If the response status is 201 (Created), show a notification
         setNotification("نوع تجهیزات با موفقیت ساخته شد");
       } else {
@@ -93,8 +97,34 @@ const TypeEquipment = () => {
     );
     setEquipmentTypes(updatedList);
     setIsModalOpen(false);
+    setSelectedId(null);
   };
+  const UpdateSet = (target: any) => {
+    setFormData({ name: target.name, description: target.description });
+    setSelectedId(target.id);
+  };
+  const update = async () => {
+    if (selectedId === null) return;
+    await axios.put(
+      `${API_URL}/equipment/equipment-types/${selectedId}`,
+      formData
+    );
 
+    const updatedList = equipmentTypes.map(
+      (equipment) =>
+        equipment.id === selectedId
+          ? { ...equipment, ...formData } // Replace the old data with updated data
+          : equipment // Keep other items unchanged
+    );
+    setFormData({
+      name: "",
+      description: "",
+    });
+    setSelectedId(null);
+
+    // Update the state with the modified list
+    setEquipmentTypes(updatedList);
+  };
 
   // Use useEffect to fetch data when the component mounts
   useEffect(() => {
@@ -139,12 +169,26 @@ const TypeEquipment = () => {
             </div>
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
-                <button
-                  type="submit"
-                  className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                >
-                  تایید
-                </button>
+                {selectedId ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={update}
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      آپدیت
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="submit"
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      تایید
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </form>
@@ -176,7 +220,10 @@ const TypeEquipment = () => {
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
-                      <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
+                      <button
+                        onClick={() => UpdateSet(equipmentType)}
+                        className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
+                      >
                         آپدیت
                       </button>
                       <button
@@ -192,7 +239,11 @@ const TypeEquipment = () => {
             </tbody>
           </table>
         </div>
-              <DeleteModal show={isModalOpen} onDelete={()=> deleteType()} onHide={closeModal}></DeleteModal>
+        <DeleteModal
+          show={isModalOpen}
+          onDelete={() => deleteType()}
+          onHide={closeModal}
+        ></DeleteModal>
       </div>
     </React.Fragment>
   );
