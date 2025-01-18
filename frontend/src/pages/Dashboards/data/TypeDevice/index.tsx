@@ -230,6 +230,7 @@ const TypeDevice = () => {
                   تاریخ خرید:
                 </label>
                 <input
+                  type="date"
                   name="purchaseDate"
                   value={formData.purchaseDate}
                   onChange={handleChange}

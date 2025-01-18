@@ -8,7 +8,7 @@ export interface column {
   enableColumnFilter: boolean;
   enableSorting: boolean;
 }
-type Equipment = {
+type EquipmentType = {
   id: number; // Represents the unique identifier
   name: string; // Name of the equipment
   description: string; // Description of the equipment
@@ -16,7 +16,7 @@ type Equipment = {
   updatedAt: string; // Timestamp when it was last updated
 };
 const TypeEquipment = () => {
-  const [equipmentTypes, setEquipmentTypes] = useState<Equipment[]>([]);
+  const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
   const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
   const API_URL = process.env.REACT_APP_API_URL;

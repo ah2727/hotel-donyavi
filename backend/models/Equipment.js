@@ -14,11 +14,6 @@ Equipment.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    serialNumber: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
     purchaseDate: {
       type: DataTypes.DATE,
     },
