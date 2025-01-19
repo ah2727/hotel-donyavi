@@ -1,4 +1,4 @@
-const Person = require('../models/persons'); // Import Person model
+const {Person} = require('../models'); // Import Person model
 
 class PersonService {
   // Create a new Person
