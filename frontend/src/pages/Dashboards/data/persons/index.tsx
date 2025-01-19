@@ -1,22 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import DeleteModal from "Common/DeleteModal";
 
 export interface Person {
-    id: number; // Primary key, auto-incremented
-    firstName: string; // Non-nullable, must not be empty
-    lastName: string; // Non-nullable, must not be empty
-    email?: string | null; // Nullable, must be a valid email if provided
-    birthdate?: Date | null; // Nullable
-    isActive: boolean; // Defaults to true
-    createdAt: Date; // Sequelize automatically adds this
-    updatedAt: Date; // Sequelize automatically adds this
-  }
-  
+  id: number; // Primary key, auto-incremented
+  firstName: string; // Non-nullable, must not be empty
+  lastName: string; // Non-nullable, must not be empty
+  email?: string | null; // Nullable, must be a valid email if provided
+  birthdate?: Date | null; // Nullable
+  isActive: boolean; // Defaults to true
+  createdAt: Date; // Sequelize automatically adds this
+  updatedAt: Date; // Sequelize automatically adds this
+}
 
 const Persons = () => {
-    const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = process.env.REACT_APP_API_URL;
   const [notification, setNotification] = useState(""); // State to store the notification message
+  const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -25,7 +26,7 @@ const Persons = () => {
     birthDate: "",
     isActive: "true", // Default value for the dropdown
   });
-  const [person,setPerson] = useState<Person[]>([])
+  const [person, setPerson] = useState<Person[]>([]);
   // Handle changes for all inputs
   const handleChange = (event: any) => {
     const { name, value } = event.target; // Get the name and value of the input
@@ -56,14 +57,58 @@ const Persons = () => {
       setNotification("Error creating Equipment Type. Please try again.");
       console.error("Error:", error);
     }
-}
+  };
+  const fetchEquipmentTypes = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/persons/persons`); // Adjust the URL if necessary
+      console.log("Response Data:", response.data); // Debugging
+      setPerson(response.data); // Set the data into the state
+    } catch (err) {
+      console.error("Error fetching equipment types:", err);
+    }
+  };
+  // Use useEffect to fetch data when the component mounts
+  useEffect(() => {
+    fetchEquipmentTypes();
+  }, []);
+  const openModal = (id: number) => {
+    setSelectedId(id);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsModalOpen(false);
+  };
+  const UpdateSet = (target: any) => {
+    setFormData({
+      firstName: target.firstName,
+      lastName: target.lastName,
+      email: target.email,
+      birthDate: target.birthDate,
+      isActive: target.isActive, // Default value for the dropdown
+    });
+    setSelectedId(target.id);
+  };
+  const deletePerson = async () => {
+    if (selectedId === null) return;
+
+    await axios.delete(`${API_URL}/persons/persons/${selectedId}`);
+    const updatedList = person.filter(
+      (person) => person.id !== selectedId
+    );
+    setPerson(updatedList);
+    setIsModalOpen(false);
+    setSelectedId(null);
+  };
   return (
     <React.Fragment>
       {notification && (
-          <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
-            {notification}
-          </div>
-        )}
+        <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
+          {notification}
+        </div>
+      )}
       <div className="card mt-10">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
@@ -179,40 +224,40 @@ const Persons = () => {
             </thead>
 
             <tbody className="list form-check-all">
-              {/* {equipmentTypes.map((equipmentType: any) => ( */}
-              <tr>
-                <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                  {/* {equipmentType.name} */}
-                </td>
-                <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                  {/* {equipmentType.description} */}
-                </td>
-                <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      //   onClick={() => UpdateSet(equipmentType)}
-                      className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
-                    >
-                      آپدیت
-                    </button>
-                    <button
-                      //   onClick={() => openModal(equipmentType.id)}
-                      className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
-                    >
-                      حذف
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              {/* ))} */}
+              {person.map((person: any) => (
+                <tr>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {person.firstName}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {person.lastName}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        onClick={() => UpdateSet(person)}
+                        className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
+                      >
+                        آپدیت
+                      </button>
+                      <button
+                        onClick={() => openModal(person.id)}
+                        className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
+                      >
+                        حذف
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-        {/* <DeleteModal
+        <DeleteModal
             show={isModalOpen}
-            onDelete={() => deleteType()}
+            onDelete={() => deletePerson()}
             onHide={closeModal}
-          ></DeleteModal> */}
+          ></DeleteModal>
       </div>
     </React.Fragment>
   );
