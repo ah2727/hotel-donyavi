@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tree } from "react-arborist"; // Import Tree and Node for proper typing
+import DeleteModal from "Common/DeleteModal";
 
 import axios from "axios";
 
