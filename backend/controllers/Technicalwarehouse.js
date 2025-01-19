@@ -6,7 +6,7 @@ const technicalWarehouseController = {
     try {
       const data = req.body;
       const newItem = await technicalWarehouseService.create(data);
-      res.status(201).json(newItem);
+      res.status(201).json({data:newItem});
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -16,7 +16,7 @@ const technicalWarehouseController = {
   async getAll(req, res) {
     try {
       const items = await technicalWarehouseService.getAll();
-      res.status(200).json(items);
+      res.status(200).json({data:items});
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -42,7 +42,7 @@ const technicalWarehouseController = {
       const { id } = req.params;
       const updates = req.body;
       const updatedItem = await technicalWarehouseService.update(id, updates);
-      res.status(200).json(updatedItem);
+      res.status(200).json({data:updatedItem});
     } catch (error) {
       res.status(404).json({ message: error.message });
     }
