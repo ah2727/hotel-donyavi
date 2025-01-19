@@ -82,7 +82,7 @@ const Places = () => {
     });
     setSelectedId(target.id);
   };
-  const deletePerson = async () => {
+  const deletePlaces = async () => {
     if (selectedId === null) return;
 
     await axios.delete(`${API_URL}/places/${selectedId}`);
@@ -90,6 +90,53 @@ const Places = () => {
     setPlaces(updatedList);
     setIsModalOpen(false);
     setSelectedId(null);
+  };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
+
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/places/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = places.map((place) =>
+            place.id === selectedId
+            ? {
+                ...place,
+                ...formData,
+
+              }
+            : place
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+            name: "",
+            description: "",
+            address: "",
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setPlaces(updatedList);
+
+        // Optional: Show a success notification
+        setNotification("Places updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update the device:", error);
+
+      // Optional: Show an error notification
+      setNotification("Failed to update the device. Please try again.");
+    } finally {
+      // Optional: Clear notifications after 3 seconds
+      setTimeout(() => {
+        setNotification("");
+      }, 3000);
+    }
   };
   return (
     <React.Fragment>
@@ -148,7 +195,7 @@ const Places = () => {
                   <>
                     <button
                       type="button"
-                      // onClick={update}
+                      onClick={update}
                       className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
                     >
                       آپدیت
@@ -202,7 +249,7 @@ const Places = () => {
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
                       <button
-                        //   onClick={() => UpdateSet(place)}
+                          onClick={() => UpdateSet(place)}
                         className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
                       >
                         آپدیت
@@ -222,7 +269,7 @@ const Places = () => {
         </div>
         <DeleteModal
             show={isModalOpen}
-            onDelete={() => deletePerson()}
+            onDelete={() => deletePlaces()}
             onHide={closeModal}
           ></DeleteModal>
       </div>

@@ -28,7 +28,7 @@ const placesController = {
   getPlaceById: async (req, res) => {
     try {
       const place = await placesService.getPlaceById(req.params.id);
-      return res.status(200).json(place);
+      return res.status(200).json({data:place});
     } catch (error) {
       console.error(error);
       return res.status(404).json({ message: error.message || 'Place not found' });
@@ -39,7 +39,7 @@ const placesController = {
   updatePlace: async (req, res) => {
     try {
       const updatedPlace = await placesService.updatePlace(req.params.id, req.body);
-      return res.status(200).json(updatedPlace);
+      return res.status(200).json({data:updatedPlace});
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message || 'Failed to update place' });
