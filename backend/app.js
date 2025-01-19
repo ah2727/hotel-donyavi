@@ -2,6 +2,8 @@ const { sequelize} = require('./models');
 const equipmentRoutes = require('./routes/Equipment');
 const personRoutes = require('./routes/persons')
 const deviceRoutes = require('./routes/device');
+const placesRoutes = require('./routes/places');
+
 const cors = require("cors");
 
 const express = require('express');
@@ -21,6 +23,7 @@ app.use(bodyParser.json()); // Parse JSON request bodies
 app.use('/equipment', equipmentRoutes);
 app.use('/persons', personRoutes);
 app.use('/device', deviceRoutes);
+app.use('/places', placesRoutes); // Mount /places routes
 
 
 

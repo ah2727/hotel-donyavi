@@ -8,10 +8,11 @@ const UserPermission = require("./userPermission")(sequelize);
 const EquipmentType = require("./EquipmentType"); // Import EquipmentType for association
 const Equipment = require("./Equipment"); // Import Equipment for association
 const PersonModel = require('./persons')
-
+const initPlace = require('./places')
 
 
 const Person = PersonModel(sequelize); // Pass sequelize instance to the model
+const Place = initPlace(sequelize);
 
 
 // Setup associations
