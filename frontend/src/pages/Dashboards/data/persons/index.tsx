@@ -39,7 +39,7 @@ const Persons = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${API_URL}/persons/persons/`,
+        `${API_URL}/persons/`,
         formData
       );
       console.log(response.data);
@@ -60,7 +60,7 @@ const Persons = () => {
   };
   const fetchEquipmentTypes = async () => {
     try {
-      const response = await axios.get(`${API_URL}/persons/persons`); // Adjust the URL if necessary
+      const response = await axios.get(`${API_URL}/persons/`); // Adjust the URL if necessary
       console.log("Response Data:", response.data); // Debugging
       setPerson(response.data); // Set the data into the state
     } catch (err) {
@@ -106,7 +106,7 @@ const Persons = () => {
 
       // Send updated data to the API
       const response = await axios.put(
-        `${API_URL}/persons/persons/${selectedId}`,
+        `${API_URL}/persons/${selectedId}`,
         formData
       );
 

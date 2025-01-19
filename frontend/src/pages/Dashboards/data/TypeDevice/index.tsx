@@ -40,7 +40,7 @@ const TypeDevice = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/device/devices/`, formData);
+      const response = await axios.post(`${API_URL}/device/`, formData);
       console.log(response.data);
       if (response.data) {
         setDeviceTypes((prevEquipmentTypes) => [
@@ -109,7 +109,7 @@ const TypeDevice = () => {
   const deleteType = async () => {
     if (selectedId === null) return;
 
-    await axios.delete(`${API_URL}/device/devices/${selectedId}`);
+    await axios.delete(`${API_URL}/device/${selectedId}`);
     const updatedList = deviceTypes.filter(
       (device) => device.id !== selectedId
     );
@@ -123,7 +123,7 @@ const TypeDevice = () => {
 
       // Send updated data to the API
       const response = await axios.put(
-        `${API_URL}/device/devices/${selectedId}`,
+        `${API_URL}/device/${selectedId}`,
         formData
       );
 
