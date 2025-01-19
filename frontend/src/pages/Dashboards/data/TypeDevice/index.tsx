@@ -75,7 +75,7 @@ const TypeDevice = () => {
 
   const fetchDevicesTypes = async () => {
     try {
-      const response = await axios.get(`${API_URL}/device/devices`); // Adjust the URL if necessary
+      const response = await axios.get(`${API_URL}/device/`); // Adjust the URL if necessary
       console.log("Response Data:", response.data); // Debugging
       setDeviceTypes(response.data); // Set the data into the state
     } catch (err) {

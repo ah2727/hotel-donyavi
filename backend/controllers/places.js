@@ -6,7 +6,7 @@ const placesController = {
   createPlace: async (req, res) => {
     try {
       const newPlace = await placesService.createPlace(req.body);
-      return res.status(201).json(newPlace);
+      return res.status(201).json({data:newPlace});
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message || 'Failed to create place' });
@@ -17,7 +17,7 @@ const placesController = {
   getAllPlaces: async (req, res) => {
     try {
       const places = await placesService.getAllPlaces();
-      return res.status(200).json(places);
+      return res.status(200).json({data:places});
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message || 'Failed to retrieve places' });

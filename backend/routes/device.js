@@ -4,18 +4,18 @@ const DeviceController = require('../controllers/device');
 const router = express.Router();
 
 // Create a new Device
-router.post('/devices', DeviceController.create);
+router.post('/', DeviceController.create);
 
 // Retrieve all Devices
-router.get('/devices', DeviceController.getAll);
+router.get('/', DeviceController.getAll);
 
 // Retrieve a Device by ID
-router.get('/devices/:id', DeviceController.getById);
+router.get('/:id', DeviceController.getById);
 
 // Update a Device by ID
-router.put('/devices/:id', DeviceController.update);
+router.put('/:id', DeviceController.update);
 
 // Delete a Device by ID
-router.delete('/devices/:id', DeviceController.delete);
+router.delete('/:id', DeviceController.delete);
 
 module.exports = router;

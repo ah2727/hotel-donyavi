@@ -94,7 +94,7 @@ const Persons = () => {
   const deletePerson = async () => {
     if (selectedId === null) return;
 
-    await axios.delete(`${API_URL}/persons/persons/${selectedId}`);
+    await axios.delete(`${API_URL}/persons/${selectedId}`);
     const updatedList = person.filter((person) => person.id !== selectedId);
     setPerson(updatedList);
     setIsModalOpen(false);

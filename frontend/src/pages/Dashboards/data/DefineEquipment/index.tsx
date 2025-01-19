@@ -47,7 +47,7 @@ const DefinEquipment = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get<DeviceType[]>(`${API_URL}/device/devices`);
+      const response = await axios.get<DeviceType[]>(`${API_URL}/device/`);
       setDevices(response.data);
     } catch (err) {
       console.error("Error fetching devices:", err);

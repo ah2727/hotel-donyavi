@@ -54,5 +54,6 @@ module.exports = {
   Permission,
   UserPermission,
   Person,
-  Device
+  Device,
+  Place
 };
