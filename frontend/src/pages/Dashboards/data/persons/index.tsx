@@ -95,12 +95,60 @@ const Persons = () => {
     if (selectedId === null) return;
 
     await axios.delete(`${API_URL}/persons/persons/${selectedId}`);
-    const updatedList = person.filter(
-      (person) => person.id !== selectedId
-    );
+    const updatedList = person.filter((person) => person.id !== selectedId);
     setPerson(updatedList);
     setIsModalOpen(false);
     setSelectedId(null);
+  };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
+
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/persons/persons/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = person.map((person) =>
+          person.id === selectedId
+            ? {
+                ...person,
+                ...formData,
+                isActive: person.isActive === true, // Convert string to boolean
+
+              }
+            : person
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          birthDate: "",
+          isActive: "true", // Default value for the dropdown
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setPerson(updatedList);
+
+        // Optional: Show a success notification
+        setNotification("Device updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update the device:", error);
+
+      // Optional: Show an error notification
+      setNotification("Failed to update the device. Please try again.");
+    } finally {
+      // Optional: Clear notifications after 3 seconds
+      setTimeout(() => {
+        setNotification("");
+      }, 3000);
+    }
   };
   return (
     <React.Fragment>
@@ -183,26 +231,26 @@ const Persons = () => {
             </div>
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
-                {/* {selectedId ? ( */}
-                <>
-                  <button
-                    type="button"
-                    // onClick={update}
-                    className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                  >
-                    آپدیت
-                  </button>
-                </>
-                {/* ) : ( */}
-                <>
-                  <button
-                    type="submit"
-                    className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                  >
-                    تایید
-                  </button>
-                </>
-                {/* )} */}
+                {selectedId ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={update}
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      آپدیت
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="submit"
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      تایید
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </form>
@@ -254,10 +302,10 @@ const Persons = () => {
           </table>
         </div>
         <DeleteModal
-            show={isModalOpen}
-            onDelete={() => deletePerson()}
-            onHide={closeModal}
-          ></DeleteModal>
+          show={isModalOpen}
+          onDelete={() => deletePerson()}
+          onHide={closeModal}
+        ></DeleteModal>
       </div>
     </React.Fragment>
   );
