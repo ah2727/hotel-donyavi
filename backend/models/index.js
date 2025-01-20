@@ -9,10 +9,12 @@ const EquipmentType = require("./EquipmentType"); // Import EquipmentType for as
 const Equipment = require("./Equipment"); // Import Equipment for association
 const PersonModel = require('./persons')
 const initPlace = require('./places')
+const DeployedEquipmentModel = require('./DeployedEquipment');
 
 
 const Person = PersonModel(sequelize); // Pass sequelize instance to the model
 const Place = initPlace(sequelize);
+const DeployedEquipment = DeployedEquipmentModel(sequelize);
 
 
 // Setup associations
@@ -47,6 +49,14 @@ Device.belongsTo(Equipment, {
   foreignKey: "equipmentId", // Foreign key in Device
   as: "equipment", // Alias for accessing the related Equipment
 });
+
+// Define relationships
+DeployedEquipment.belongsTo(Equipment, { foreignKey: 'equipmentId', as: 'equipment' });
+Equipment.hasOne(DeployedEquipment, { foreignKey: 'equipmentId', as: 'deployedEquipment' });
+
+DeployedEquipment.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
+Place.hasOne(DeployedEquipment, { foreignKey: 'placeId', as: 'deployedEquipment' });
+
 // Export models and sequelize instance
 module.exports = {
   sequelize,
