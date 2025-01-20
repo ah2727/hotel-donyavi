@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import DeleteModal from "Common/DeleteModal";
+
 export interface TechnicalWarehouse {
-  id?: string;
+  id?: number;
   quantity: number;
   location?: string;
   category: string;
@@ -17,7 +19,7 @@ const TechnicalWarehouse = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
   const [formData, setFormData] = useState({
     name:"",
-    quantity: "",
+    quantity: 0,
     location: "",
     category: "",
     isAvailable: "true",
@@ -44,7 +46,7 @@ const TechnicalWarehouse = () => {
         ]);
         setFormData({
           name:"",
-          quantity: "",
+          quantity:0,
           location: "",
           category: "",
           isAvailable: "true",
@@ -57,6 +59,98 @@ const TechnicalWarehouse = () => {
     } catch (error) {
       setNotification("Error creating Equipment Type. Please try again.");
       console.error("Error:", error);
+    }
+  };
+  const fetchtechnicalWarehouse = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/technicalWarehouse/`); // Adjust the URL if necessary
+      console.log("Response Data:", response.data); // Debugging
+      setTechnicalWarehouse(response.data); // Set the data into the state
+    } catch (err) {
+      console.error("Error fetching equipment types:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchtechnicalWarehouse();
+  }, []); // Empty dependency array means this runs once when the component mounts
+
+  const openModal = (id: number) => {
+    setSelectedId(id);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsModalOpen(false);
+  };
+  const UpdateSet = (target: any) => {
+    setFormData({
+      name: target.name,
+      quantity: target.quantity,
+      location: target.location,
+      category: target.category,
+      isAvailable: target.isAvailable,
+    });
+    setSelectedId(target.id);
+  };
+  const deleteWarhous = async () => {
+    if (selectedId === null) return;
+
+    await axios.delete(`${API_URL}/technicalWarehouse/${selectedId}`);
+    const updatedList = TechnicalWarehouse.filter((Warehous) => Warehous.id !== selectedId);
+    setTechnicalWarehouse(updatedList);
+    setIsModalOpen(false);
+    setSelectedId(null);
+  };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
+
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/technicalWarehouse/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = TechnicalWarehouse.map((Warehous) =>
+          Warehous.id === selectedId
+            ? {
+                ...Warehous,
+                ...formData,
+                isAvailable: Warehous.isAvailable === true, // Convert string to boolean
+              }
+            : Warehous
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+          name:"",
+          quantity: 0,
+          location: "",
+          category: "",
+          isAvailable: "true",
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setTechnicalWarehouse(updatedList);
+
+        // Optional: Show a success notification
+        setNotification("TechnicalWarehouse updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update the device:", error);
+
+      // Optional: Show an error notification
+      setNotification("Failed to update the device. Please try again.");
+    } finally {
+      // Optional: Clear notifications after 3 seconds
+      setTimeout(() => {
+        setNotification("");
+      }, 3000);
     }
   };
   return (
@@ -145,7 +239,7 @@ const TechnicalWarehouse = () => {
                   <>
                     <button
                       type="button"
-                      // onClick={update}
+                      onClick={update}
                       className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
                     >
                       آپدیت
@@ -171,11 +265,15 @@ const TechnicalWarehouse = () => {
           <table className="w-full whitespace-nowrap">
             <thead>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                نام نوع تجهیزات
+                نام انبار
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                توضیحات
+                حجم انبار
               </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                آدرس
+              </th> 
+                           
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 عملیات
               </th>
@@ -185,21 +283,24 @@ const TechnicalWarehouse = () => {
               {TechnicalWarehouse.map((Warehous: any) => (
                 <tr>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {Warehous.location}
+                    {Warehous.name}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {Warehous.ca}
+                    {Warehous.quantity}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {Warehous.location}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
                       <button
-                        // onClick={() => UpdateSet(Warehous)}
+                        onClick={() => UpdateSet(Warehous)}
                         className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
                       >
                         آپدیت
                       </button>
                       <button
-                        // onClick={() => openModal(Warehous.id)}
+                        onClick={() => openModal(Warehous.id)}
                         className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
                       >
                         حذف
@@ -211,11 +312,11 @@ const TechnicalWarehouse = () => {
             </tbody>
           </table>
         </div>
-        {/* <DeleteModal
+        <DeleteModal
           show={isModalOpen}
-          onDelete={() => deletePerson()}
+          onDelete={() => deleteWarhous()}
           onHide={closeModal}
-        ></DeleteModal> */}
+        ></DeleteModal>
       </div>
     </React.Fragment>
   );
