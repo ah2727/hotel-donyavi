@@ -66,5 +66,6 @@ module.exports = {
   Person,
   Device,
   Place,
+  Equipment,
   DeployedEquipment
 };
