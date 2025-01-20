@@ -5,7 +5,7 @@ const DeployedEquipmentController = {
     try {
       const data = req.body;
       const deployedEquipment = await DeployedEquipmentService.createDeployedEquipment(data);
-      res.status(201).json(deployedEquipment);
+      res.status(201).json({data:deployedEquipment});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -16,7 +16,7 @@ const DeployedEquipmentController = {
       const id = req.params.id;
       const deployedEquipment = await DeployedEquipmentService.getDeployedEquipmentById(id);
       if (!deployedEquipment) return res.status(404).json({ error: 'DeployedEquipment not found' });
-      res.status(200).json(deployedEquipment);
+      res.status(200).json({data:deployedEquipment});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -25,7 +25,7 @@ const DeployedEquipmentController = {
   async getAll(req, res) {
     try {
       const deployedEquipmentList = await DeployedEquipmentService.getAllDeployedEquipment();
-      res.status(200).json(deployedEquipmentList);
+      res.status(200).json({data:deployedEquipmentList});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -36,7 +36,7 @@ const DeployedEquipmentController = {
       const id = req.params.id;
       const updates = req.body;
       const updatedDeployedEquipment = await DeployedEquipmentService.updateDeployedEquipment(id, updates);
-      res.status(200).json(updatedDeployedEquipment);
+      res.status(200).json({data:updatedDeployedEquipment});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }

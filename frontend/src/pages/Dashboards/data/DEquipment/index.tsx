@@ -21,17 +21,24 @@ type Equipment = {
   devices: Device[]; // Associated devices
 };
 interface Place {
-    id: number;
-    name: string;
-    description: string;
-    address: string;
-  }
+  id: number;
+  name: string;
+  description: string;
+  address: string;
+}
 const DEquipment = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [equipment, setEquipmnet] = useState<Equipment[]>([]);
-  const [selectedEquipment, setSelectedEquipment] = useState(""); // Selected equipment ID
-  const [selectedPlace, setSelectedPlace] = useState(""); // Selected equipment ID
-  const [places,setPlaces] = useState<Place[]>([]);
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [notification, setNotification] = useState(""); // State to store the notification message
+  const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
+
+  const [formData, setFormData] = useState({
+    selectedEquipment: "",
+    selectedPlace: "",
+    status: "active",
+    deploymentDate: "",
+  });
   const fetchEquipment = async () => {
     try {
       // Fetch equipment data from the API
@@ -56,37 +63,66 @@ const DEquipment = () => {
     fetchEquipment();
     fetchPlaces();
   }, []);
-  const handleSelectEquipmentChange = (event: any) => {
-    setSelectedEquipment(event.target.value); // Set the selected equipment ID
-    console.log("Selected Equipment ID:", event.target.value); // Debugging/logging
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData, // Spread the current form data
+      [name]: value, // Update the specific input field by name
+    });
   };
-  const handleSelectPlaceChange = (event: any) => {
-    setSelectedEquipment(event.target.value); // Set the selected equipment ID
-    console.log("Selected Equipment ID:", event.target.value); // Debugging/logging
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${API_URL}/deployedEquipment/`,
+        formData
+      );
+      if (response.data) {
+        setEquipmnet((prevEquipmentTypes) => [
+          ...prevEquipmentTypes,
+          response.data, // Add the newly created equipment type
+        ]);
+        setFormData({
+          selectedEquipment: "",
+          selectedPlace: "",
+          status: "active",
+          deploymentDate: "",
+        });
+        // If the response status is 201 (Created), show a notification
+        setNotification("تجهیزات مستقر با موفقیت ساخته شد");
+      } else {
+        setNotification("یک ارور ناشناخته از سرور.");
+      }
+    } catch (error) {
+      setNotification("Error creating Equipment Type. Please try again.");
+      console.error("Error:", error);
+    }
   };
   return (
     <React.Fragment>
-      {/* {notification && (
+      {notification && (
         <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
           {notification}
         </div>
-      )} */}
+      )}
       <div className="card mt-10">
         <div className="card-body">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
                 <label className="inline-block mb-2 text-base font-medium">
                   فعال:
                 </label>
                 <select
-                  name="isAvailable"
-                  //   value={formData.isAvailable}
-                  //   onChange={handleChange}
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
                   className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                 >
-                  <option value="true">فعال</option>
-                  <option value="false">غیر فعال</option>
+                  <option value="active">فعال</option>
+                  <option value="Inactive">غیر فعال</option>
                 </select>
               </div>
             </div>
@@ -97,9 +133,9 @@ const DEquipment = () => {
                 </label>
                 <input
                   type="date"
-                  name="quantity"
-                  //   value={formData.quantity}
-                  //   onChange={handleChange}
+                  name="deploymentDate"
+                  value={formData.deploymentDate}
+                  onChange={handleChange}
                   className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                 ></input>
               </div>
@@ -110,9 +146,9 @@ const DEquipment = () => {
                   تجهیزات:
                 </label>
                 <select
-                  id="equipmentDropdown"
-                  value={selectedEquipment} // Controlled component
-                  onChange={handleSelectEquipmentChange} // Handle selection
+                  name="selectedEquipment"
+                  value={formData.selectedEquipment}
+                  onChange={handleChange}
                   className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                 >
                   <option value="" disabled>
@@ -130,9 +166,9 @@ const DEquipment = () => {
                   محل:
                 </label>
                 <select
-                  id="equipmentDropdown"
-                  value={selectedEquipment} // Controlled component
-                  onChange={handleSelectPlaceChange} // Handle selection
+                  name="selectedPlace"
+                  value={formData.selectedPlace}
+                  onChange={handleChange}
                   className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                 >
                   <option value="" disabled>
@@ -149,11 +185,11 @@ const DEquipment = () => {
 
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
-                {/* {selectedId ? (
+                {selectedId ? (
                   <>
                     <button
                       type="button"
-                      onClick={update}
+                      //   onClick={update}
                       className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
                     >
                       آپدیت
@@ -168,7 +204,7 @@ const DEquipment = () => {
                       تایید
                     </button>
                   </>
-                )} */}
+                )}
               </div>
             </div>
           </form>

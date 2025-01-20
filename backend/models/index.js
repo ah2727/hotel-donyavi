@@ -65,5 +65,6 @@ module.exports = {
   UserPermission,
   Person,
   Device,
-  Place
+  Place,
+  DeployedEquipment
 };
