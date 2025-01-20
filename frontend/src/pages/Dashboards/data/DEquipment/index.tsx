@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import DeleteModal from "Common/DeleteModal";
+
 type Device = {
   id: number;
   name: string;
@@ -30,8 +32,8 @@ export type DeployedEquipment = {
   id: number; // Primary key
   status: "active" | "inactive" | "maintenance"; // Restrict to valid options
   deploymentDate: string; // ISO format string
-  equipmentId: number; // Foreign key to Equipment
-  placeId: number; // Foreign key to Place
+  equipmentId: string; // Foreign key to Equipment
+  placeId: string; // Foreign key to Place
   equipment?: Equipment; // Associated Equipment object (optional, for eager loading)
   place?: Place; // Associated Place object (optional, for eager loading)
 };
@@ -42,6 +44,7 @@ const DEquipment = () => {
   const [notification, setNotification] = useState(""); // State to store the notification message
   const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
   const [DEquipment, setDEquipment] = useState<DeployedEquipment[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
   const [formData, setFormData] = useState({
     equipmentId: "",
     placeId: "",
@@ -118,6 +121,85 @@ const DEquipment = () => {
     } catch (error) {
       setNotification("Error creating Equipment Type. Please try again.");
       console.error("Error:", error);
+    }
+  };
+  const openModal = (id: number) => {
+    setSelectedId(id);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsModalOpen(false);
+  };
+  const UpdateSet = (target: any) => {
+    setFormData({
+      equipmentId: target.equipmentId,
+      placeId: target.placeId,
+      status: target.status,
+      deploymentDate: target.deploymentDate,
+    });
+    setSelectedId(target.id);
+  };
+  const deleteDequipment = async () => {
+    if (selectedId === null) return;
+
+    await axios.delete(`${API_URL}/deployedEquipment/${selectedId}`);
+    const updatedList = DEquipment.filter(
+      (equipment) => equipment.id !== selectedId
+    );
+    setDEquipment(updatedList);
+    setIsModalOpen(false);
+    setSelectedId(null);
+  };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
+
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/deployedEquipment/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = DEquipment.map((equipment) =>
+          equipment.id === selectedId
+            ? {
+                ...equipment,
+                ...formData,
+                status: formData.status as "active" | "inactive" | "maintenance", // Type assertion
+
+              }
+            : equipment
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+          equipmentId: "",
+          placeId: "",
+          status: "active",
+          deploymentDate: "",
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setDEquipment(updatedList);
+
+        // Optional: Show a success notification
+        setNotification("DEquipment updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update the DEquipment:", error);
+
+      // Optional: Show an error notification
+      setNotification("Failed to update the DEquipment. Please try again.");
+    } finally {
+      // Optional: Clear notifications after 3 seconds
+      setTimeout(() => {
+        setNotification("");
+      }, 3000);
     }
   };
   return (
@@ -209,7 +291,7 @@ const DEquipment = () => {
                   <>
                     <button
                       type="button"
-                      //   onClick={update}
+                      onClick={update}
                       className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
                     >
                       آپدیت
@@ -264,13 +346,13 @@ const DEquipment = () => {
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
                       <button
-                        // onClick={() => UpdateSet(Warehous)}
+                        onClick={() => UpdateSet(equipment)}
                         className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
                       >
                         آپدیت
                       </button>
                       <button
-                        // onClick={() => openModal(Warehous.id)}
+                        onClick={() => openModal(equipment.id)}
                         className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
                       >
                         حذف
@@ -282,11 +364,11 @@ const DEquipment = () => {
             </tbody>
           </table>
         </div>
-        {/* <DeleteModal
+        <DeleteModal
           show={isModalOpen}
-          onDelete={() => deleteWarhous()}
+          onDelete={() => deleteDequipment()}
           onHide={closeModal}
-        ></DeleteModal> */}
+        ></DeleteModal>
       </div>
     </React.Fragment>
   );
