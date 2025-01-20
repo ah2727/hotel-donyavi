@@ -5,7 +5,7 @@ import DeleteModal from "Common/DeleteModal";
 
 import axios from "axios";
 
-type DeviceType = {
+type Device = {
   id: number;
   name: string;
   brand: string;
@@ -15,7 +15,7 @@ type DeviceType = {
   status: "active" | "inactive" | "retired";
 };
 
-type EquipmentType = {
+type Equipment = {
   id: number;
   name: string;
   serialNumber: string;
@@ -23,7 +23,7 @@ type EquipmentType = {
   equipmentTypeId?: number;
   createdAt: string;
   updatedAt: string;
-  devices: DeviceType[]; // Associated devices
+  devices: Device[]; // Associated devices
 };
 type TreeNodeType = {
   id: number | string; // ID of the node
@@ -50,7 +50,7 @@ const Arborist = () => {
       setError(null); // Clear any previous errors
 
       // Fetch equipment data from the API
-      const response = await axios.get<EquipmentType[]>(
+      const response = await axios.get<Equipment[]>(
         `${API_URL}/equipment/equipment`
       );
 
