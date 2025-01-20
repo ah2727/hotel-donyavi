@@ -26,16 +26,25 @@ interface Place {
   description: string;
   address: string;
 }
+export type DeployedEquipment = {
+  id: number; // Primary key
+  status: "active" | "inactive" | "maintenance"; // Restrict to valid options
+  deploymentDate: string; // ISO format string
+  equipmentId: number; // Foreign key to Equipment
+  placeId: number; // Foreign key to Place
+  equipment?: Equipment; // Associated Equipment object (optional, for eager loading)
+  place?: Place; // Associated Place object (optional, for eager loading)
+};
 const DEquipment = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [equipment, setEquipmnet] = useState<Equipment[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
   const [notification, setNotification] = useState(""); // State to store the notification message
   const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
-
+  const [DEquipment, setDEquipment] = useState<DeployedEquipment[]>([]);
   const [formData, setFormData] = useState({
-    selectedEquipment: "",
-    selectedPlace: "",
+    equipmentId: "",
+    placeId: "",
     status: "active",
     deploymentDate: "",
   });
@@ -59,7 +68,18 @@ const DEquipment = () => {
     } finally {
     }
   };
+  const fetchDEquipment = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/deployedEquipment/`); // Adjust the URL if necessary
+      console.log("Response Data:", response.data); // Debugging
+      setDEquipment(response.data); // Set the data into the state
+    } catch (err) {
+      console.error("Error fetching equipment types:", err);
+    }
+  };
+
   useEffect(() => {
+    fetchDEquipment();
     fetchEquipment();
     fetchPlaces();
   }, []);
@@ -80,13 +100,13 @@ const DEquipment = () => {
         formData
       );
       if (response.data) {
-        setEquipmnet((prevEquipmentTypes) => [
+        setDEquipment((prevEquipmentTypes) => [
           ...prevEquipmentTypes,
           response.data, // Add the newly created equipment type
         ]);
         setFormData({
-          selectedEquipment: "",
-          selectedPlace: "",
+          equipmentId: "",
+          placeId: "",
           status: "active",
           deploymentDate: "",
         });
@@ -146,8 +166,8 @@ const DEquipment = () => {
                   تجهیزات:
                 </label>
                 <select
-                  name="selectedEquipment"
-                  value={formData.selectedEquipment}
+                  name="equipmentId"
+                  value={formData.equipmentId}
                   onChange={handleChange}
                   className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                 >
@@ -166,8 +186,8 @@ const DEquipment = () => {
                   محل:
                 </label>
                 <select
-                  name="selectedPlace"
-                  value={formData.selectedPlace}
+                  name="placeId"
+                  value={formData.placeId}
                   onChange={handleChange}
                   className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                 >
@@ -230,27 +250,27 @@ const DEquipment = () => {
             </thead>
 
             <tbody className="list form-check-all">
-              {/* {TechnicalWarehouse.map((Warehous: any) => (
+              {DEquipment.map((equipment: any) => (
                 <tr>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {Warehous.name}
+                    {equipment.status}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {Warehous.quantity}
+                    {equipment.quantity}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {Warehous.location}
+                    {equipment.location}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
                       <button
-                        onClick={() => UpdateSet(Warehous)}
+                        // onClick={() => UpdateSet(Warehous)}
                         className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
                       >
                         آپدیت
                       </button>
                       <button
-                        onClick={() => openModal(Warehous.id)}
+                        // onClick={() => openModal(Warehous.id)}
                         className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
                       >
                         حذف
@@ -258,7 +278,7 @@ const DEquipment = () => {
                     </div>
                   </td>
                 </tr>
-              ))} */}
+              ))}
             </tbody>
           </table>
         </div>
