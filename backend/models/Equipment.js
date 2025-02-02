@@ -14,15 +14,25 @@ Equipment.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    purchaseDate: {
-      type: DataTypes.DATE,
-    },
     equipmentTypeId: {
       type: DataTypes.INTEGER,
       references: {
         model: EquipmentType, // Links to the EquipmentType model
         key: "id",
       },
+    },
+    serialNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    guaranteeEnd: {
+      type: DataTypes.DATE,
+    },
+    Propertynumber:{
+      type: DataTypes.STRING,
+    },
+    description: {
+      type: DataTypes.STRING,
     },
   },
   {

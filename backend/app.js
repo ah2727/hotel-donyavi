@@ -11,7 +11,7 @@ const cors = require("cors");
 
 const express = require('express');
 const bodyParser = require('body-parser');
-// sequelize.sync({alter:true})
+sequelize.sync({alter:true})
 const app = express();
 const PORT = 3000;
 app.use(cors());

@@ -22,15 +22,6 @@ Device.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    serialNumber: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
-    },
-    purchaseDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
     status: {
       type: DataTypes.ENUM('active', 'inactive', 'retired'),
       defaultValue: 'active',

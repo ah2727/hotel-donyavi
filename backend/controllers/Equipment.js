@@ -7,19 +7,25 @@ class EquipmentController {
     try {
       const {
         name,
-        serialNumber,
-        purchaseDate,
         equipmentTypeId,
         selectedDevices, // Array of device IDs
+        placeId,
+        serialNumber,
+        guaranteeEnd,
+        Propertynumber,
+        description
       } = req.body;
 
       // Pass data to the service layer
       const createdEquipment = await EquipmentService.createEquipment({
         name,
-        serialNumber,
-        purchaseDate,
         equipmentTypeId,
         selectedDevices,
+        placeId,
+        serialNumber,
+        guaranteeEnd,
+        Propertynumber,
+        description,
       });
 
       // Send response

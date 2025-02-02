@@ -50,6 +50,18 @@ Device.belongsTo(Equipment, {
   as: "equipment", // Alias for accessing the related Equipment
 });
 
+
+// In Place model:
+Place.hasMany(Equipment, {
+  foreignKey: 'placeId', // This column will be added to the Equipment table
+  as: 'equipments'       // You can use this alias to reference the associated equipment
+});
+
+// In Equipment model:
+Equipment.belongsTo(Place, {
+  foreignKey: 'placeId',
+  as: 'place'           // This alias allows you to easily access the related Place
+});
 // Define relationships
 DeployedEquipment.belongsTo(Equipment, { foreignKey: 'equipmentId', as: 'equipment' });
 Equipment.hasOne(DeployedEquipment, { foreignKey: 'equipmentId', as: 'deployedEquipment' });
