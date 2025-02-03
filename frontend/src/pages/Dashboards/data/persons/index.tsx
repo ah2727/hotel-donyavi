@@ -264,10 +264,16 @@ const Persons = () => {
           <table className="w-full whitespace-nowrap">
             <thead>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                نام نوع تجهیزات
+                نام
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                توضیحات
+                نام خانوادگی
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                سمت
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                دسترسی تعمیر
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 عملیات
@@ -282,6 +288,12 @@ const Persons = () => {
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     {person.lastName}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {person.Position}
+                  </td>
+                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                    {person.Repairaccess}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">

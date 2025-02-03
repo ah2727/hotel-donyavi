@@ -53,6 +53,7 @@ const Arborist = () => {
       const response = await axios.get<Equipment[]>(
         `${API_URL}/equipment/equipment`
       );
+      console.log("yes");
 
       // Transform equipment data into a tree structure
       const transformedTreeData = response.data.map((equipment) => ({

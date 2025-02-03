@@ -19,6 +19,8 @@ const Place = initPlace(sequelize);
 const DeployedEquipment = DeployedEquipmentModel(sequelize);
 const MainPlace = initMainPlace(sequelize)
 const subPlace = initSubplaces(sequelize)
+
+
 // Setup associations
 User.belongsToMany(Permission, {
   through: UserPermission,
@@ -43,12 +45,12 @@ EquipmentType.hasMany(Equipment, {
 
 // Define the association between Equipment and Device
 // Relationships
-Equipment.hasMany(Device, {
-  foreignKey: "equipmentId", // Foreign key in Device
+Equipment.belongsTo(Device, {
+  foreignKey: "deviceId", // Foreign key in Device
   as: "devices", // Alias for accessing related Devices
 });
-Device.belongsTo(Equipment, {
-  foreignKey: "equipmentId", // Foreign key in Device
+Device.hasMany(Equipment, {
+  foreignKey: "deviceId", // Foreign key in Device
   as: "equipment", // Alias for accessing the related Equipment
 });
 
@@ -70,6 +72,31 @@ Equipment.hasOne(DeployedEquipment, { foreignKey: 'equipmentId', as: 'deployedEq
 
 DeployedEquipment.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
 Place.hasOne(DeployedEquipment, { foreignKey: 'placeId', as: 'deployedEquipment' });
+
+
+// Each Place has one MainPlace.
+Place.hasOne(MainPlace, {
+  foreignKey: 'placeId',   // This column must exist in the MainPlace table.
+  as: 'mainPlace'          // Alias for easier eager loading and querying.
+});
+
+// The inverse: each MainPlace belongs to a Place.
+MainPlace.belongsTo(Place, {
+  foreignKey: 'placeId',
+  as: 'place'
+});
+
+// Each Place has one SubPlace.
+Place.hasOne(subPlace, {
+  foreignKey: 'placeId',   // This column must exist in the SubPlace table.
+  as: 'subPlace'           // Alias for eager loading and querying.
+});
+
+// The inverse: each SubPlace belongs to a Place.
+subPlace.belongsTo(Place, {
+  foreignKey: 'placeId',
+  as: 'place'
+});
 
 // Export models and sequelize instance
 module.exports = {

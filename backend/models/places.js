@@ -18,14 +18,7 @@ module.exports = (sequelize) => {
           notEmpty: true,
         },
       },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
+
     },
     {
       sequelize, // Pass the Sequelize instance.
