@@ -293,7 +293,11 @@ const Persons = () => {
                     {person.Position}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {person.Repairaccess}
+                    {person.Repairaccess == true ? (
+                      <div>دارد</div>
+                    ) : (
+                      <span>ندارد</span>
+                    )}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
