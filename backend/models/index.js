@@ -1,12 +1,14 @@
 const { Sequelize } = require("sequelize");
 const sequelize = require("../configs/database");
-const Device = require("./device"); 
+const Device = require("./Device"); 
 // Import models
 const User = require("./users")(sequelize);
 const Permission = require("./permission")(sequelize);
 const UserPermission = require("./userPermission")(sequelize);
 const EquipmentType = require("./EquipmentType"); // Import EquipmentType for association
 const Equipment = require("./Equipment"); // Import Equipment for association
+const initMainPlace = require("./mainPlace")
+const initSubplaces = require("./subPlace")
 const PersonModel = require('./persons')
 const initPlace = require('./places')
 const DeployedEquipmentModel = require('./DeployedEquipment');
@@ -15,8 +17,8 @@ const DeployedEquipmentModel = require('./DeployedEquipment');
 const Person = PersonModel(sequelize); // Pass sequelize instance to the model
 const Place = initPlace(sequelize);
 const DeployedEquipment = DeployedEquipmentModel(sequelize);
-
-
+const MainPlace = initMainPlace(sequelize)
+const subPlace = initSubplaces(sequelize)
 // Setup associations
 User.belongsToMany(Permission, {
   through: UserPermission,
@@ -79,5 +81,7 @@ module.exports = {
   Device,
   Place,
   Equipment,
-  DeployedEquipment
+  DeployedEquipment,
+  MainPlace,
+  subPlace
 };
