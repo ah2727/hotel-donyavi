@@ -6,8 +6,8 @@ export interface Person {
   id: number; // Primary key, auto-incremented
   firstName: string; // Non-nullable, must not be empty
   lastName: string; // Non-nullable, must not be empty
-  email?: string | null; // Nullable, must be a valid email if provided
-  birthdate?: Date | null; // Nullable
+  Position?: string | null; // Nullable, must be a valid email if provided
+  Repairaccess: boolean;
   isActive: boolean; // Defaults to true
   createdAt: Date; // Sequelize automatically adds this
   updatedAt: Date; // Sequelize automatically adds this
@@ -22,8 +22,8 @@ const Persons = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
-    birthDate: "",
+    Position: "",
+    Repairaccess: "false",
     isActive: "true", // Default value for the dropdown
   });
   const [person, setPerson] = useState<Person[]>([]);
@@ -38,10 +38,7 @@ const Persons = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API_URL}/persons/`,
-        formData
-      );
+      const response = await axios.post(`${API_URL}/persons/`, formData);
       console.log(response.data);
       if (response.data) {
         setPerson((prevEquipmentTypes) => [
@@ -85,8 +82,8 @@ const Persons = () => {
     setFormData({
       firstName: target.firstName,
       lastName: target.lastName,
-      email: target.email,
-      birthDate: target.birthDate,
+      Position: target.Position,
+      Repairaccess: target.Repairaccess,
       isActive: target.isActive, // Default value for the dropdown
     });
     setSelectedId(target.id);
@@ -118,7 +115,7 @@ const Persons = () => {
                 ...person,
                 ...formData,
                 isActive: person.isActive === true, // Convert string to boolean
-
+                Repairaccess: person.Repairaccess === true,
               }
             : person
         );
@@ -126,8 +123,8 @@ const Persons = () => {
         setFormData({
           firstName: "",
           lastName: "",
-          email: "",
-          birthDate: "",
+          Position: "",
+          Repairaccess: "false",
           isActive: "true", // Default value for the dropdown
         });
         setSelectedId(null);
@@ -160,57 +157,63 @@ const Persons = () => {
       <div className="card mt-10">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  نام:
-                </label>
-                <input
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></input>
+            <div className="grid grid-cols-2">
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start ">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    نام:
+                  </label>
+                  <input
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  ></input>
+                </div>
+              </div>
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start ">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    نام خانوادگی:
+                  </label>
+                  <input
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  ></input>
+                </div>
               </div>
             </div>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  نام خانوادگی:
-                </label>
-                <input
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></input>
+            <div className="grid grid-cols-2">
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start ">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    سمت:
+                  </label>
+                  <input
+                    name="Position"
+                    value={formData.Position}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  ></input>
+                </div>
               </div>
-            </div>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  ایمیل:
-                </label>
-                <input
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></input>
-              </div>
-            </div>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  تاریخ تولد:
-                </label>
-                <input
-                  name="birthDate"
-                  type="date"
-                  value={formData.birthDate}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></input>
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start ">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    دسترسی تعمیرات:
+                  </label>
+                  <select
+                    name="Repairaccess"
+                    value={formData.Repairaccess}
+                    onChange={handleChange}
+                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  >
+                    <option value="true">فعال</option>
+                    <option value="false">غیر فعال</option>
+                  </select>
+                </div>
               </div>
             </div>
             <div className="mb-4 flex flex-col items-center">
