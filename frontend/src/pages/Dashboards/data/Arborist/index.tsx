@@ -1,90 +1,124 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tree } from "react-arborist"; // Import Tree and Node for proper typing
-import DeleteModal from "Common/DeleteModal";
-
+import { Tree } from "react-arborist";
 import axios from "axios";
 
-type Device = {
-  id: number;
-  name: string;
-  brand: string;
-  model: string;
-  serialNumber?: string;
-  purchaseDate?: string;
-  status: "active" | "inactive" | "retired";
+// Base tree node type for react-arborist.
+type TreeNodeType = {
+  id: number | string; // Unique identifier
+  name: string;        // Display name
+  isLeaf: boolean;     // Whether this node is a leaf
+  children?: TreeNodeType[]; // Nested children (if any)
 };
 
-type Equipment = {
+// Raw equipment record from your API
+interface EquipmentRecord {
   id: number;
   name: string;
-  serialNumber: string;
-  purchaseDate?: string;
-  equipmentTypeId?: number;
+  equipmentTypeId: number;
   createdAt: string;
   updatedAt: string;
-  devices: Device[]; // Associated devices
-};
-type TreeNodeType = {
-  id: number | string; // ID of the node
-  name: string; // Name to display
-  isLeaf: boolean; // If true, the node is a leaf (e.g., a device)
-  children?: TreeNodeType[]; // Nested children
-};
+  placeId: string | null;
+  serialNumber: string;
+  guaranteeEnd: string | null;
+  Propertynumber: string | null;
+  description: string | null;
+  deviceId: number | null; // (Ignored in this grouping)
+}
+
+// A tree node for equipment. (Used for both equipment type and equipment nodes.)
+interface EquipmentTreeNode extends TreeNodeType {
+  equipmentTypeId: number;
+  children: EquipmentTreeNode[]; // Always have a children array (may be empty)
+}
 
 const Arborist = () => {
   const navigate = useNavigate();
-  const [treeData, setTreeData] = useState<TreeNodeType[]>([]); // Default to an empty array
-  const [loading, setLoading] = useState(false); // State for loading spinner
-  const [error, setError] = useState<string | null>(null); // State for errors
+  const [treeData, setTreeData] = useState<EquipmentTreeNode[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-  const navigateToPost = (url: any) => {
-    navigate(url); // Navigate to /post/:id
-  };
-  // Fetch equipment data and transform it into tree structure
+  // Fetch equipment data, group by equipmentTypeId, and update the parent's name using the equipment-types endpoint.
   const fetchEquipment = async () => {
     try {
-      setLoading(true); // Start loading
-      setError(null); // Clear any previous errors
+      setLoading(true);
+      setError(null);
 
-      // Fetch equipment data from the API
-      const response = await axios.get<Equipment[]>(
+      // Fetch all equipment records.
+      const response = await axios.get<EquipmentRecord[]>(
         `${API_URL}/equipment/equipment`
       );
-      console.log("yes");
 
-      // Transform equipment data into a tree structure
-      const transformedTreeData = response.data.map((equipment) => ({
-        id: `equipment-${equipment.id}`, // Unique ID for each equipment
-        name: equipment.name, // Equipment name
-        isLeaf: false, // Equipment is not a leaf node
-        children: equipment.devices.map((device) => ({
-          id: `device-${device.id}`, // Unique ID for each device
-          name: `${device.name} (${device.model})`, // Device name with model
-          isLeaf: true, // Devices are leaf nodes
-        })),
-      }));
-      console.log(transformedTreeData);
-      // Set the transformed data as the tree structure
-      setTreeData(transformedTreeData);
-    } catch (error) {
-      console.error("Error fetching equipment data:", error);
+      // Group equipment records by equipmentTypeId.
+      const equipmentGroups: { [key: number]: EquipmentTreeNode } = {};
+
+      response.data.forEach((record) => {
+        // If we haven't created a parent node for this equipment type yet, do so.
+        if (!equipmentGroups[record.equipmentTypeId]) {
+          equipmentGroups[record.equipmentTypeId] = {
+            id: `equipment-type-${record.equipmentTypeId}`,
+            // Set a default name; this will be updated after fetching the equipment type details.
+            name: `Equipment Type ${record.equipmentTypeId}`,
+            equipmentTypeId: record.equipmentTypeId,
+            isLeaf: false,
+            children: [],
+          };
+        }
+        // Create a node for the equipment record.
+        const equipmentNode: EquipmentTreeNode = {
+          id: `equipment-${record.id}`,
+          name: record.name,
+          equipmentTypeId: record.equipmentTypeId,
+          isLeaf: true,
+          children: [],
+        };
+
+        // Add the equipment record node as a child of its corresponding equipment type node.
+        equipmentGroups[record.equipmentTypeId].children.push(equipmentNode);
+      });
+
+      // For each unique equipmentTypeId, fetch the equipment type details.
+      const equipmentTypeIds = Object.keys(equipmentGroups);
+      await Promise.all(
+        equipmentTypeIds.map(async (typeIdStr) => {
+          const typeId = Number(typeIdStr);
+          try {
+            const typeResponse = await axios.get(
+              `${API_URL}/equipment/equipment-types/${typeId}`
+            );
+            // Assume the response returns an object with a "name" property.
+            equipmentGroups[typeId].name =
+              typeResponse.data.name || equipmentGroups[typeId].name;
+          } catch (err) {
+            console.error(`Failed to fetch equipment type ${typeId}`, err);
+            // If the API call fails, the node will retain its default name.
+          }
+        })
+      );
+
+      // Convert the groups into an array for the tree.
+      const finalTree: EquipmentTreeNode[] = Object.values(equipmentGroups);
+      setTreeData(finalTree);
+    } catch (err) {
+      console.error("Error fetching equipment data:", err);
       setError("Failed to fetch equipment data. Please try again.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
-  // Fetch data on component mount
+  // Fetch data when the component mounts.
   useEffect(() => {
     fetchEquipment();
   }, []);
+
   if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <React.Fragment>
+    <>
       <div className="card mt-10">
         <div className="card-body">
           <div className="flex gap-2">
@@ -92,10 +126,10 @@ const Arborist = () => {
               onClick={() => navigate("/DefinEquipment")}
               className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
             >
-              تعریف تچهیزات
+              تعریف تجهیزات
             </button>
             <button
-              onClickCapture={() => navigate("/TypeEquipment")}
+              onClick={() => navigate("/TypeEquipment")}
               className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
             >
               تعریف نوع تجهیزات
@@ -118,26 +152,23 @@ const Arborist = () => {
           </Tree>
         </div>
       </div>
-    </React.Fragment>
+    </>
   );
 };
-// Custom node renderer for the Tree component
-// NodeRenderer component
-// Custom NodeRenderer component for rendering each node
-// Custom NodeRenderer component for rendering each node
-// NodeRenderer for rendering each node
+
+// Custom node renderer for react-arborist.
 const NodeRenderer = <T extends TreeNodeType>({
   node,
   style,
 }: {
-  node: { data: T; isLeaf: boolean; toggle: () => void; isOpen: boolean }; // Ensure `toggle` and `isOpen` are available
-  style: React.CSSProperties; // Inline styles for the node
+  node: { data: T; isLeaf: boolean; toggle: () => void; isOpen: boolean };
+  style: React.CSSProperties;
 }) => {
   return (
     <div
       style={style}
       className="cursor-pointer flex items-center"
-      onClick={() => node.toggle()} // Properly call node.toggle
+      onClick={() => node.toggle()}
     >
       {node.isLeaf ? (
         <span>📱 {node.data.name}</span>
