@@ -15,6 +15,7 @@ export type PlaceOption = {
   name: string;
   address: string;
 };
+
 const Places = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [notification, setNotification] = useState(""); // State to store the notification message
@@ -24,10 +25,17 @@ const Places = () => {
   const [isModalOpenSubPlace, setIsModalOpenSubPlace] = useState(false); // Track modal visibility
   const [mainPlaces, setMainPlaces] = useState<PlaceOption[]>([]);
   const [subPlaces, setSubPlaces] = useState<PlaceOption[]>([]);
+  const [selectedOptionMainPlace, setSelectedOptionMainPlace] =
+    useState<string>("");
+  const [selectedOptionSubPlace, setSelectedOptionSubPlace] =
+    useState<string>("");
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     address: "",
+    selectedMainPlace: "",
+    selectedSubPlace: "",
   });
   const [places, setPlaces] = useState<Place[]>([]);
   const handleChange = (event: any) => {
@@ -50,6 +58,8 @@ const Places = () => {
           name: "",
           description: "",
           address: "",
+          selectedMainPlace: "",
+          selectedSubPlace: "",
         });
         // If the response status is 201 (Created), show a notification
         setNotification("شخص با موفقیت ساخته شد");
@@ -100,6 +110,8 @@ const Places = () => {
       name: target.name,
       description: target.description,
       address: target.address,
+      selectedMainPlace: target.selectedMainPlace,
+      selectedSubPlace: target.selectedSubPlace,
     });
     setSelectedId(target.id);
   };
@@ -137,6 +149,8 @@ const Places = () => {
           name: "",
           description: "",
           address: "",
+          selectedMainPlace: "",
+          selectedSubPlace: "",
         });
         setSelectedId(null);
 
@@ -190,6 +204,20 @@ const Places = () => {
     fetchMainPlaces();
     fetchSubPlaces();
   }, []); // empty dependency array means this runs once on mount
+  const handleMainPlaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedMainPlace: e.target.value,
+    }));
+  };
+
+  // Handle changes for the SubPlace select
+  const handleSubPlaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedSubPlace: e.target.value,
+    }));
+  };
 
   return (
     <React.Fragment>
@@ -222,6 +250,18 @@ const Places = () => {
                   </label>
                   <div className="flex">
                     <PlusCircle onClick={openModalMainPalce} />
+                    <select
+                      value={formData.selectedMainPlace}
+                      onChange={handleMainPlaceChange}
+                      className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    >
+                      <option value="">Select a main place</option>
+                      {mainPlaces.map((place) => (
+                        <option key={place.id} value={place.id}>
+                          {place.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -231,6 +271,18 @@ const Places = () => {
                   <label className="inline-block mb-2 text-base font-medium">
                     مکان فرعی:
                     <PlusCircle onClick={openModalSubPalce} />
+                    <select
+                      value={formData.selectedSubPlace}
+                      onChange={handleSubPlaceChange}
+                      className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    >
+                      <option value="">Select a main place</option>
+                      {mainPlaces.map((place) => (
+                        <option key={place.id} value={place.id}>
+                          {place.name}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                 </div>
               </div>

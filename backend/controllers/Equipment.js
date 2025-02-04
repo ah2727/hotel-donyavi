@@ -9,10 +9,6 @@ class EquipmentController {
         name,
         equipmentTypeId,
         selectedDevices, // Array of device IDs
-        placeId,
-        serialNumber,
-        guaranteeEnd,
-        Propertynumber,
         description
       } = req.body;
 
@@ -21,10 +17,6 @@ class EquipmentController {
         name,
         equipmentTypeId,
         selectedDevices,
-        placeId,
-        serialNumber,
-        guaranteeEnd,
-        Propertynumber,
         description,
       });
 

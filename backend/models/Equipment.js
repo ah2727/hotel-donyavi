@@ -21,16 +21,6 @@ Equipment.init(
         key: "id",
       },
     },
-    serialNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    guaranteeEnd: {
-      type: DataTypes.DATE,
-    },
-    Propertynumber:{
-      type: DataTypes.STRING,
-    },
     description: {
       type: DataTypes.STRING,
     },

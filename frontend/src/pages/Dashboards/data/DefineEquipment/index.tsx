@@ -22,14 +22,9 @@ type EquipmentType = {
 type EquipmentFormData = {
   id?: number; // Optional for new equipment (not required on creation)
   name: string;
-  serialNumber: string;
-  purchaseDate?: string; // Date as an ISO string
   equipmentTypeId?: number; // Foreign key for EquipmentType
   selectedDevices: number[]; // Array of device IDs (for multiple selection)
-  placeId?: number;
-  guaranteeEnd:string;
-  Propertynumber:string;
-  description:string;
+  description: string;
 };
 export interface Place {
   id: string;
@@ -41,18 +36,13 @@ const DefinEquipment = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [devices, setDevices] = useState<DeviceType[]>([]);
   const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
-  const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<EquipmentFormData>({
     name: "",
-    serialNumber: "",
     equipmentTypeId: undefined,
     selectedDevices: [], // Store selected devices here
-    placeId: undefined,
-    guaranteeEnd:"",
-    Propertynumber:"",
-    description:""
+    description: "",
   });
 
   // Fetch devices from API
@@ -87,17 +77,8 @@ const DefinEquipment = () => {
     }
   };
 
-  const fetchPlaces = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/places`);
-      setPlaces(response.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
   // Fetch data on component mount
   useEffect(() => {
-    fetchPlaces();
     fetchDevice();
     fetchEquipmentType();
   }, []);
@@ -145,7 +126,7 @@ const DefinEquipment = () => {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <div className="mb-4 flex flex-col items-center">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex justify-center">
                 <div className="flex flex-col items-start">
                   <label className="inline-block mb-2 text-base font-medium">
                     نام دستگاه:
@@ -158,40 +139,24 @@ const DefinEquipment = () => {
                     className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   />
                 </div>
-                <div className="mb-4 flex flex-col items-center">
-                  <div className="flex flex-col items-start">
-                    <label className="inline-block mb-2 text-base font-medium">
-                      سریال نامبر:
-                    </label>
-                    <input
-                      type="text"
-                      name="serialNumber"
-                      value={formData.serialNumber}
-                      onChange={handleChange}
-                      className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
             <div className="grid gap-4 grid-cols-2 mt-5">
               <div className="mb-4 flex flex-col items-center">
                 <div className="flex flex-col items-start">
                   <label className="inline-block mb-2 text-base font-medium">
-                    محل:
+                    نوع دستگاه:
                   </label>
                   <select
-                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                    name="placeId"
-                    value={formData.placeId || ""}
+                    multiple
+                    name="selectedDevices"
+                    value={formData.selectedDevices.map(String)} // Convert to string for the `value` attribute
                     onChange={handleChange}
+                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   >
-                    <option value="" disabled>
-                      انتخاب کنید
-                    </option>
-                    {places.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
+                    {devices.map((device) => (
+                      <option key={device.id} value={device.id}>
+                        {device.name}
                       </option>
                     ))}
                   </select>
@@ -220,57 +185,11 @@ const DefinEquipment = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 mt-5">
-              <div className="mb-4 flex flex-col items-center">
-                <div className="flex flex-col items-start">
-                  <label className="inline-block mb-2 text-base font-medium">
-                    نوع دستگاه:
-                  </label>
-                  <select
-                    multiple
-                    name="selectedDevices"
-                    value={formData.selectedDevices.map(String)} // Convert to string for the `value` attribute
-                    onChange={handleChange}
-                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  >
-                    {devices.map((device) => (
-                      <option key={device.id} value={device.id}>
-                        {device.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-4 flex flex-col items-center">
-                <div className="flex flex-col items-start">
-                  <label className="inline-block mb-2 text-base font-medium">
-                    تاریخ اتمام گارانتی:
-                  </label>
-                  <input
-                    type="date"
-                    name="guaranteeEnd"
-                    value={formData.guaranteeEnd}
-                    onChange={handleChange}
-                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200" />
-                </div>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 mt-5">
-              <div className="mb-4 flex flex-col items-center">
-                <div className="flex flex-col items-start">
-                  <label className="inline-block mb-2 text-base font-medium">
-                    شماره اموال:
-                  </label>
-                    <input type="text" 
-                    name="Propertynumber"
-                    value={formData.Propertynumber}
-                    onChange={handleChange}
-                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200" />
-               
-                </div>
-              </div>
-              <div className="mb-4 flex flex-col items-center">
+
+            <div className="flex justify-center">
+
+              <div className="flex flex-col items-center mb-10">
                 <div className="flex flex-col items-start">
                   <label className="inline-block mb-2 text-base font-medium">
                     توضیحات:
@@ -280,21 +199,20 @@ const DefinEquipment = () => {
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200" />
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  />
                 </div>
               </div>
             </div>
             <div className="mb-4 flex flex-col items-center">
-
-            <div className="mb-4 flex flex-col items-center">
-              <button
-                type="submit"
-                className="text-white btn bg-custom-500 hover:bg-custom-600"
-              >
-                تایید
-              </button>
-            </div>
-            
+              <div className="mb-4 flex flex-col items-center">
+                <button
+                  type="submit"
+                  className="text-white btn bg-custom-500 hover:bg-custom-600"
+                >
+                  تایید
+                </button>
+              </div>
             </div>
           </form>
         </div>
