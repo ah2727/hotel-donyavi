@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DeleteModal from "Common/DeleteModal";
-
+import AddMainPlaceModal from "Common/addMainPlaceModal";
+import AddSubPlaceModal from "Common/addSubPlaceModal";
+import { PlusCircle } from "lucide-react";
 interface Place {
   id: number;
   name: string;
   description: string;
   address: string;
 }
-
+export type PlaceOption = {
+  id: string;
+  name: string;
+  address: string;
+};
 const Places = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [notification, setNotification] = useState(""); // State to store the notification message
   const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
   const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
+  const [isModalOpenMainPlace, setIsModalOpenMainPlace] = useState(false); // Track modal visibility
+  const [isModalOpenSubPlace, setIsModalOpenSubPlace] = useState(false); // Track modal visibility
+  const [mainPlaces, setMainPlaces] = useState<PlaceOption[]>([]);
+  const [subPlaces, setSubPlaces] = useState<PlaceOption[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -30,7 +40,7 @@ const Places = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/places/`, formData);
+      const response = await axios.post(`${API_URL}/places/place/`, formData);
       if (response.data) {
         setPlaces((prevEquipmentTypes) => [
           ...prevEquipmentTypes,
@@ -53,7 +63,7 @@ const Places = () => {
   };
   const fetchDevicesTypes = async () => {
     try {
-      const response = await axios.get(`${API_URL}/places/`); // Adjust the URL if necessary
+      const response = await axios.get(`${API_URL}/places/place/`); // Adjust the URL if necessary
       console.log("Response Data:", response.data); // Debugging
       setPlaces(response.data); // Set the data into the state
     } catch (err) {
@@ -68,7 +78,18 @@ const Places = () => {
     setSelectedId(id);
     setIsModalOpen(true);
   };
-
+  const openModalMainPalce = () => {
+    setIsModalOpenMainPlace(true);
+  };
+  const openModalSubPalce = () => {
+    setIsModalOpenSubPlace(true);
+  };
+  const closeModalMainPlace = () => {
+    setIsModalOpenMainPlace(false);
+  };
+  const closeModalSubPlace = () => {
+    setIsModalOpenSubPlace(false);
+  };
   // Close modal
   const closeModal = () => {
     setSelectedId(null);
@@ -85,7 +106,7 @@ const Places = () => {
   const deletePlaces = async () => {
     if (selectedId === null) return;
 
-    await axios.delete(`${API_URL}/places/${selectedId}`);
+    await axios.delete(`${API_URL}/places/place/${selectedId}`);
     const updatedList = places.filter((place) => place.id !== selectedId);
     setPlaces(updatedList);
     setIsModalOpen(false);
@@ -104,19 +125,18 @@ const Places = () => {
       if (response.data) {
         // Update the local state with the updated device
         const updatedList = places.map((place) =>
-            place.id === selectedId
+          place.id === selectedId
             ? {
                 ...place,
                 ...formData,
-
               }
             : place
         );
         // Reset the form and clear the selected ID
         setFormData({
-            name: "",
-            description: "",
-            address: "",
+          name: "",
+          description: "",
+          address: "",
         });
         setSelectedId(null);
 
@@ -138,6 +158,39 @@ const Places = () => {
       }, 3000);
     }
   };
+  useEffect(() => {
+    // Fetch MainPlaces
+    const fetchMainPlaces = async () => {
+      try {
+        const response = await fetch(`${API_URL}/places/mainplace/`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch main places");
+        }
+        const data: PlaceOption[] = await response.json();
+        setMainPlaces(data);
+      } catch (error) {
+        console.error("Error fetching main places:", error);
+      }
+    };
+
+    // Fetch SubPlaces
+    const fetchSubPlaces = async () => {
+      try {
+        const response = await fetch(`${API_URL}/places/subplace/`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch sub places");
+        }
+        const data: PlaceOption[] = await response.json();
+        setSubPlaces(data);
+      } catch (error) {
+        console.error("Error fetching sub places:", error);
+      }
+    };
+
+    fetchMainPlaces();
+    fetchSubPlaces();
+  }, []); // empty dependency array means this runs once on mount
+
   return (
     <React.Fragment>
       {notification && (
@@ -161,34 +214,27 @@ const Places = () => {
                 ></input>
               </div>
             </div>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  توضیحات:
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></textarea>
+            <div className="grid grid-cols-2">
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start ">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    مکان اصلی:
+                  </label>
+                  <div className="flex">
+                    <PlusCircle onClick={openModalMainPalce} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start ">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    مکان فرعی:
+                    <PlusCircle onClick={openModalSubPalce} />
+                  </label>
+                </div>
               </div>
             </div>
-
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  آدرس:
-                </label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></textarea>
-              </div>
-            </div>
-
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
                 {selectedId ? (
@@ -249,13 +295,13 @@ const Places = () => {
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">
                       <button
-                          onClick={() => UpdateSet(place)}
+                        onClick={() => UpdateSet(place)}
                         className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
                       >
                         آپدیت
                       </button>
                       <button
-                          onClick={() => openModal(place.id)}
+                        onClick={() => openModal(place.id)}
                         className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
                       >
                         حذف
@@ -268,10 +314,18 @@ const Places = () => {
           </table>
         </div>
         <DeleteModal
-            show={isModalOpen}
-            onDelete={() => deletePlaces()}
-            onHide={closeModal}
-          ></DeleteModal>
+          show={isModalOpen}
+          onDelete={() => deletePlaces()}
+          onHide={closeModal}
+        ></DeleteModal>
+        <AddMainPlaceModal
+          show={isModalOpenMainPlace}
+          onHide={closeModalMainPlace}
+        ></AddMainPlaceModal>
+        <AddSubPlaceModal
+          show={isModalOpenSubPlace}
+          onHide={closeModalSubPlace}
+        ></AddSubPlaceModal>
       </div>
     </React.Fragment>
   );
