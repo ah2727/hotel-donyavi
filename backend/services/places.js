@@ -20,7 +20,13 @@ const placesService = {
       });
       await newPlace.setMainPlace(mainPlaceInstance);
       await newPlace.setSubPlace(subplaceInstance);
-      return newPlace;
+      const newPlaceRes = await Place.findByPk(newPlace.id, {
+        include: [
+          { model: MainPlace, as: "mainPlace", attributes: ["id", "name"] },
+          { model: subPlace, as: "subPlace", attributes: ["id", "name"] },
+        ],
+      });
+      return newPlaceRes;
     } catch (error) {
       console.error("Error in placesService.createPlace:", error);
       throw new Error("Failed to create place");
