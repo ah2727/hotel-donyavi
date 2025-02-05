@@ -222,6 +222,9 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
                       آدرس
                     </th>
                     <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                      توضیحات
+                    </th>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
                       عملیات
                     </th>
                   </thead>

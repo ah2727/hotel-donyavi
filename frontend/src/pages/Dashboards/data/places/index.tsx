@@ -343,13 +343,13 @@ const Places = () => {
           <table className="w-full whitespace-nowrap">
             <thead>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                نام نوع تجهیزات
+                نام مکان
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                آدرس
+                مکان اصلی
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                توضیحات
+                مکان فرعی
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 عملیات
@@ -363,10 +363,10 @@ const Places = () => {
                     {place.name}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {place.address}
+                    {place.mainplace}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {place.description}
+                    {place.subplace}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">

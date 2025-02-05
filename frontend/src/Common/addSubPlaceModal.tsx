@@ -1,13 +1,130 @@
 import React from "react";
 import Modal from "./Components/Modal";
-import { X } from 'lucide-react';
-
+import { useState, useEffect } from "react";
+import { X, PlusCircle, EyeIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 interface props {
   show: boolean;
   onHide: () => void;
 }
+export type PlaceOption = {
+  id: string;
+  name: string;
+  address: string;
+};
 
-const AddSubPlaceModal: React.FC<props> = ({ show, onHide }) => {
+const AddSubplaceModal: React.FC<props> = ({ show, onHide }) => {
+  const API_URL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
+
+  const [isAdd, setIsAdd] = useState(false);
+  const [subplace, setsubplace] = useState<PlaceOption[]>([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    description: "",
+  });
+  const [selectedId, setSelectedId] = useState(null);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleIsAdd = () => {
+    setIsAdd(true);
+  };
+  const handleIsList = () => {
+    setIsAdd(false);
+  };
+  useEffect(() => {
+    async function getPlace() {
+      const response = await axios.get(`${API_URL}/places/subplace/`);
+      setsubplace(response.data);
+    }
+    getPlace();
+  }, []);
+  const UpdateSet = (target: any) => {
+    setFormData({
+      name: target.name,
+      address: target.address,
+      description: target.description,
+    });
+    setSelectedId(target.id);
+    setIsAdd(true);
+  };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
+
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/places/subplace/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = subplace.map((place) =>
+          place.id === selectedId
+            ? {
+                ...place,
+                ...formData,
+              }
+            : place
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+          name: "",
+          address: "",
+          description: "",
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setsubplace(updatedList);
+        setIsAdd(false); // Switch back to the list view
+        // Optional: Show a success notification
+      }
+    } catch (error) {
+    } finally {
+    }
+  };
+  const HandlCreate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await axios.post(`${API_URL}/places/subplace/`, formData);
+      const updatedList = subplace.map((place) =>
+        place.id === selectedId
+          ? {
+              ...place,
+              ...formData,
+            }
+          : place
+      );
+      setsubplace(updatedList);
+      setFormData({
+        name: "",
+        address: "",
+        description: "",
+      });
+      setIsAdd(false);
+      onHide();
+    } catch {
+      console.log("error");
+    }
+  };
+  const HandlDelete = async (id: number) => {
+    try {
+      await axios.delete(`${API_URL}/places/subplace/${id}`);
+      setsubplace(subplace.filter((place: any) => place.id !== id));
+    } catch {
+      console.log("error");
+    }
+  };
   return (
     <React.Fragment>
       <Modal
@@ -28,31 +145,127 @@ const AddSubPlaceModal: React.FC<props> = ({ show, onHide }) => {
             </button>
           </div>
           <div className="mt-5 text-center">
-            <h5 className="mb-1">Are you sure?</h5>
-            <p className="text-slate-500 dark:text-zink-200">
-              Are you certain you want to delete this record?
-            </p>
-            <div className="flex justify-center gap-2 mt-6">
-              <button
-                type="reset"
-                className="bg-white text-slate-500 btn hover:text-slate-500 hover:bg-slate-100 focus:text-slate-500 focus:bg-slate-100 active:text-slate-500 active:bg-slate-100 dark:bg-zink-600 dark:hover:bg-slate-500/10 dark:focus:bg-slate-500/10 dark:active:bg-slate-500/10"
-                onClick={onHide}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                id="deleteRecord"
-                data-modal-close="deleteModal"
-                className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
-              >
-                Yes, Delete It!
-              </button>
-            </div>
+            {isAdd ? (
+              <>
+                <EyeIcon onClick={handleIsList} />
+                <form onSubmit={HandlCreate}>
+                  <div className="mb-4 flex flex-col items-center">
+                    <div className="flex flex-col items-start ">
+                      <label className="inline-block mb-2 text-base font-medium">
+                        نام:
+                      </label>
+                      <input
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                      ></input>
+                    </div>
+                    <div className="mb-4 flex flex-col items-center">
+                      <div className="flex flex-col items-start ">
+                        <label className="inline-block mb-2 text-base font-medium">
+                          آدرس:
+                        </label>
+                        <input
+                          name="address"
+                          value={formData.address}
+                          onChange={handleChange}
+                          className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                        ></input>
+                      </div>
+                    </div>
+                    <div className="mb-4 flex flex-col items-center">
+                      <div className="flex flex-col items-start ">
+                        <label className="inline-block mb-2 text-base font-medium">
+                          توضیحات:
+                        </label>
+                        <input
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                        ></input>
+                      </div>
+                    </div>
+                    {selectedId ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={update}
+                          className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                        >
+                          آپدیت
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="submit"
+                          className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                        >
+                          تایید
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </form>
+              </>
+            ) : (
+              <>
+                <PlusCircle onClick={handleIsAdd} />
+                <table className="w-full whitespace-nowrap">
+                  <thead>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
+                      نام
+                    </th>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                      آدرس
+                    </th>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                      توضیحات
+                    </th>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                      عملیات
+                    </th>
+                  </thead>
+                  <tbody className="list form-check-all">
+                    {subplace?.map((place: any) => (
+                      <tr>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          {place.name}
+                        </td>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          {place.address}
+                        </td>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          {place.description}
+                        </td>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          <div className="flex gap-2 justify-center">
+                            <button
+                              onClick={() => UpdateSet(place)}
+                              className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
+                            >
+                              آپدیت
+                            </button>
+                            <button
+                              onClick={() => HandlDelete(place.id)}
+                              className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
           </div>
         </Modal.Body>
       </Modal>
     </React.Fragment>
   );
 };
-export default AddSubPlaceModal;
+export default AddSubplaceModal;
