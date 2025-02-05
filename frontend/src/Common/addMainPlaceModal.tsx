@@ -8,18 +8,24 @@ interface props {
   show: boolean;
   onHide: () => void;
 }
+export type PlaceOption = {
+  id: string;
+  name: string;
+  address: string;
+};
 
 const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
   const API_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const [isAdd, setIsAdd] = useState(false);
-  const [MainPlace, setMainPlace] = useState([]);
+  const [MainPlace, setMainPlace] = useState<PlaceOption[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     description: "",
   });
+  const [selectedId, setSelectedId] = useState(null);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -40,15 +46,81 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
       setMainPlace(response.data);
     }
     getPlace();
-    
   }, []);
+  const UpdateSet = (target: any) => {
+    setFormData({
+      name: target.name,
+      address: target.address,
+      description: target.description,
+    });
+    setSelectedId(target.id);
+    setIsAdd(true);
+  };
+  const update = async () => {
+    try {
+      if (selectedId === null) return; // Prevent proceeding if no ID is selected
 
+      // Send updated data to the API
+      const response = await axios.put(
+        `${API_URL}/places/mainplace/${selectedId}`,
+        formData
+      );
+
+      if (response.data) {
+        // Update the local state with the updated device
+        const updatedList = MainPlace.map((place) =>
+          place.id === selectedId
+            ? {
+                ...place,
+                ...formData,
+              }
+            : place
+        );
+        // Reset the form and clear the selected ID
+        setFormData({
+          name: "",
+          address: "",
+          description: "",
+        });
+        setSelectedId(null);
+
+        // Update the state with the modified list
+        setMainPlace(updatedList);
+        setIsAdd(false); // Switch back to the list view
+        // Optional: Show a success notification
+      }
+    } catch (error) {
+    } finally {
+    }
+  };
   const HandlCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       await axios.post(`${API_URL}/places/mainplace/`, formData);
+      const updatedList = MainPlace.map((place) =>
+        place.id === selectedId
+          ? {
+              ...place,
+              ...formData,
+            }
+          : place
+      );
+      setMainPlace(updatedList);
+      setFormData({
+        name: "",
+        address: "",
+        description: "",
+      });
+      setIsAdd(false);
       onHide();
-
+    } catch {
+      console.log("error");
+    }
+  };
+  const HandlDelete = async (id: number) => {
+    try {
+      await axios.delete(`${API_URL}/places/mainplace/${id}`);
+      setMainPlace(MainPlace.filter((place: any) => place.id !== id));
     } catch {
       console.log("error");
     }
@@ -115,12 +187,26 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
                         ></input>
                       </div>
                     </div>
-                    <button
-                      type="submit"
-                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                    >
-                      تایید
-                    </button>
+                    {selectedId ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={update}
+                          className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                        >
+                          آپدیت
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="submit"
+                          className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                        >
+                          تایید
+                        </button>
+                      </>
+                    )}
                   </div>
                 </form>
               </>
@@ -140,30 +226,35 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
                     </th>
                   </thead>
                   <tbody className="list form-check-all">
-                    {
-                      MainPlace?.map((place: any) => (
-                        <tr>
-                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                            {place.name}
-                          </td>
-                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                            {place.address}
-                          </td>
-                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                            {place.description}
-                          </td>
-                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                            <div className="flex gap-2 justify-center">
-                              <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
-                                آپدیت
-                              </button>
-                              <button className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
-                                حذف
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                    {MainPlace?.map((place: any) => (
+                      <tr>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          {place.name}
+                        </td>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          {place.address}
+                        </td>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          {place.description}
+                        </td>
+                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                          <div className="flex gap-2 justify-center">
+                            <button
+                              onClick={() => UpdateSet(place)}
+                              className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
+                            >
+                              آپدیت
+                            </button>
+                            <button
+                              onClick={() => HandlDelete(place.id)}
+                              className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </>
