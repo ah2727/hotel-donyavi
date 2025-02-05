@@ -96,16 +96,9 @@ const AddSubplaceModal: React.FC<props> = ({ show, onHide }) => {
   const HandlCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await axios.post(`${API_URL}/places/subplace/`, formData);
-      const updatedList = subplace.map((place) =>
-        place.id === selectedId
-          ? {
-              ...place,
-              ...formData,
-            }
-          : place
-      );
-      setsubplace(updatedList);
+      const response = await axios.post(`${API_URL}/places/subplace/`, formData);
+      setsubplace((prevSubPlaces) => [...prevSubPlaces, response.data]);
+
       setFormData({
         name: "",
         address: "",

@@ -96,16 +96,10 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
   const HandlCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await axios.post(`${API_URL}/places/mainplace/`, formData);
-      const updatedList = MainPlace.map((place) =>
-        place.id === selectedId
-          ? {
-              ...place,
-              ...formData,
-            }
-          : place
-      );
-      setMainPlace(updatedList);
+      const response = await axios.post(`${API_URL}/places/mainplace/`, formData);
+      setMainPlace((prevMainPlaces) => [...prevMainPlaces, response.data]);
+
+
       setFormData({
         name: "",
         address: "",
