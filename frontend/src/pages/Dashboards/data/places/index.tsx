@@ -142,8 +142,8 @@ const Places = () => {
       name: target.name,
       description: target.description,
       address: target.address,
-      selectedMainPlace: target.selectedMainPlace,
-      selectedSubPlace: target.selectedSubPlace,
+      selectedMainPlace: target.mainPlace?.id,
+      selectedSubPlace: target.subPlace?.id,
     });
     setSelectedId(target.id);
   };
@@ -162,7 +162,7 @@ const Places = () => {
 
       // Send updated data to the API
       const response = await axios.put(
-        `${API_URL}/places/${selectedId}`,
+        `${API_URL}/places/place/${selectedId}`,
         formData
       );
 
@@ -172,7 +172,7 @@ const Places = () => {
           place.id === selectedId
             ? {
                 ...place,
-                ...formData,
+                ...response.data,
               }
             : place
         );

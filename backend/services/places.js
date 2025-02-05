@@ -34,15 +34,15 @@ const placesService = {
         include: [
           {
             model: MainPlace,
-            as: 'mainPlace', // Use the alias defined in the association
-            attributes: ['id', 'name']
+            as: "mainPlace", // Use the alias defined in the association
+            attributes: ["id", "name"],
           },
           {
             model: subPlace,
-            as: 'subPlace', // Use the alias defined in the association
-            attributes: ['id', 'name']
-          }
-        ]
+            as: "subPlace", // Use the alias defined in the association
+            attributes: ["id", "name"],
+          },
+        ],
       });
     } catch (error) {
       console.error("Error in placesService.getAllPlaces:", error);
@@ -67,9 +67,25 @@ const placesService = {
     try {
       const place = await Place.findByPk(id);
       if (!place) throw new Error("Place not found");
+      const { name, selectedMainPlace, selectedSubPlace } = data;
 
-      const updatedPlace = await place.update(data);
-      return updatedPlace;
+      const updatedPlace = await place.update(name);
+      const subplaceInstance = await subPlace.findOne({
+        where: { id: selectedSubPlace },
+      });
+      const mainPlaceInstance = await MainPlace.findOne({
+        where: { id: selectedMainPlace },
+      });
+      await updatedPlace.setMainPlace(mainPlaceInstance);
+      await updatedPlace.setSubPlace(subplaceInstance);
+      // Reload the updated place including its associated mainPlace and subPlace
+      const updatedPlaceRes = await Place.findByPk(id, {
+        include: [
+          { model: MainPlace, as: "mainPlace", attributes: ["id", "name"] },
+          { model: subPlace, as: "subPlace", attributes: ["id", "name"] },
+        ],
+      });
+      return updatedPlaceRes;
     } catch (error) {
       console.error("Error in placesService.updatePlace:", error);
       throw new Error(error.message || "Failed to update place");
