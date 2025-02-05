@@ -9,6 +9,8 @@ interface Place {
   name: string;
   description: string;
   address: string;
+  mainPlace: PlaceOption;
+  subPlace: PlaceOption;
 }
 export type PlaceOption = {
   id: string;
@@ -363,10 +365,10 @@ const Places = () => {
                     {place.name}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {place.mainplace}
+                    {place.mainPlace?.name}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {place.subplace}
+                    {place.subPlace?.name}
                   </td>
                   <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                     <div className="flex gap-2 justify-center">

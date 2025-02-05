@@ -1,4 +1,5 @@
 // services/placesService.js
+const { where } = require("sequelize");
 const { Place } = require("../models");
 const { MainPlace } = require("../models");
 const { subPlace } = require("../models");
@@ -7,14 +8,18 @@ const placesService = {
   // Create a new place
   createPlace: async (data) => {
     try {
-      const { name, description, address, latitude, longitude } = data;
+      const { name, selectedMainPlace, selectedSubPlace } = data;
       const newPlace = await Place.create({
         name,
-        description,
-        address,
-        latitude,
-        longitude,
       });
+      const subplaceInstance = await subPlace.findOne({
+        where: { id: selectedSubPlace },
+      });
+      const mainPlaceInstance = await MainPlace.findOne({
+        where: { id: selectedMainPlace },
+      });
+      await newPlace.setMainPlace(mainPlaceInstance);
+      await newPlace.setSubPlace(subplaceInstance);
       return newPlace;
     } catch (error) {
       console.error("Error in placesService.createPlace:", error);
@@ -25,7 +30,20 @@ const placesService = {
   // Get all places
   getAllPlaces: async () => {
     try {
-      return await Place.findAll();
+      return await Place.findAll({
+        include: [
+          {
+            model: MainPlace,
+            as: 'mainPlace', // Use the alias defined in the association
+            attributes: ['id', 'name']
+          },
+          {
+            model: subPlace,
+            as: 'subPlace', // Use the alias defined in the association
+            attributes: ['id', 'name']
+          }
+        ]
+      });
     } catch (error) {
       console.error("Error in placesService.getAllPlaces:", error);
       throw new Error("Failed to fetch places");
