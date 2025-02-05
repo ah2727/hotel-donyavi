@@ -1,21 +1,57 @@
 import React from "react";
 import Modal from "./Components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, PlusCircle, EyeIcon } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 interface props {
   show: boolean;
   onHide: () => void;
 }
 
 const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
-  const [isAdd, setIsAdd] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
+  const [isAdd, setIsAdd] = useState(false);
+  const [MainPlace, setMainPlace] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    description: "",
+  });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
   const handleIsAdd = () => {
     setIsAdd(true);
   };
   const handleIsList = () => {
     setIsAdd(false);
+  };
+  useEffect(() => {
+    async function getPlace() {
+      const response = await axios.get(`${API_URL}/places/mainplace/`);
+      setMainPlace(response.data);
+    }
+    getPlace();
+    
+  }, []);
+
+  const HandlCreate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await axios.post(`${API_URL}/places/mainplace/`, formData);
+      onHide();
+
+    } catch {
+      console.log("error");
+    }
   };
   return (
     <React.Fragment>
@@ -40,12 +76,96 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
             {isAdd ? (
               <>
                 <EyeIcon onClick={handleIsList} />
-                <></>
+                <form onSubmit={HandlCreate}>
+                  <div className="mb-4 flex flex-col items-center">
+                    <div className="flex flex-col items-start ">
+                      <label className="inline-block mb-2 text-base font-medium">
+                        نام:
+                      </label>
+                      <input
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                      ></input>
+                    </div>
+                    <div className="mb-4 flex flex-col items-center">
+                      <div className="flex flex-col items-start ">
+                        <label className="inline-block mb-2 text-base font-medium">
+                          آدرس:
+                        </label>
+                        <input
+                          name="address"
+                          value={formData.address}
+                          onChange={handleChange}
+                          className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                        ></input>
+                      </div>
+                    </div>
+                    <div className="mb-4 flex flex-col items-center">
+                      <div className="flex flex-col items-start ">
+                        <label className="inline-block mb-2 text-base font-medium">
+                          توضیحات:
+                        </label>
+                        <input
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                        ></input>
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                    >
+                      تایید
+                    </button>
+                  </div>
+                </form>
               </>
             ) : (
               <>
                 <PlusCircle onClick={handleIsAdd} />
-                <div className=""></div>
+                <table className="w-full whitespace-nowrap">
+                  <thead>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
+                      نام
+                    </th>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                      آدرس
+                    </th>
+                    <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
+                      عملیات
+                    </th>
+                  </thead>
+                  <tbody className="list form-check-all">
+                    {
+                      MainPlace?.map((place: any) => (
+                        <tr>
+                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                            {place.name}
+                          </td>
+                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                            {place.address}
+                          </td>
+                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                            {place.description}
+                          </td>
+                          <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
+                            <div className="flex gap-2 justify-center">
+                              <button className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20">
+                                آپدیت
+                              </button>
+                              <button className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">
+                                حذف
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
               </>
             )}
           </div>

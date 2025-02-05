@@ -96,9 +96,39 @@ const Places = () => {
   };
   const closeModalMainPlace = () => {
     setIsModalOpenMainPlace(false);
+    // Fetch MainPlaces
+    const fetchMainPlaces = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/places/mainplace/`);
+
+        setMainPlaces(response.data);
+      } catch (error) {
+        console.error("Error fetching main places:", error);
+      }
+    };
+
+    // Fetch SubPlaces
+
+    fetchMainPlaces();
   };
   const closeModalSubPlace = () => {
     setIsModalOpenSubPlace(false);
+
+    // Fetch MainPlaces
+
+    // Fetch SubPlaces
+    const fetchSubPlaces = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/places/subplace/`);
+
+        setSubPlaces(response.data);
+      } catch (error) {
+        console.error("Error fetching sub places:", error);
+      }
+    };
+
+    fetchSubPlaces();
+    // empty dependency array means this runs once on mount
   };
   // Close modal
   const closeModal = () => {
@@ -176,12 +206,8 @@ const Places = () => {
     // Fetch MainPlaces
     const fetchMainPlaces = async () => {
       try {
-        const response = await fetch(`${API_URL}/places/mainplace/`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch main places");
-        }
-        const data: PlaceOption[] = await response.json();
-        setMainPlaces(data);
+        const response = await axios.get(`${API_URL}/places/mainplace/`);
+        setMainPlaces(response.data);
       } catch (error) {
         console.error("Error fetching main places:", error);
       }
@@ -190,17 +216,13 @@ const Places = () => {
     // Fetch SubPlaces
     const fetchSubPlaces = async () => {
       try {
-        const response = await fetch(`${API_URL}/places/subplace/`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch sub places");
-        }
-        const data: PlaceOption[] = await response.json();
-        setSubPlaces(data);
+        const response = await axios.get(`${API_URL}/places/subplace/`);
+        setSubPlaces(response.data);
       } catch (error) {
         console.error("Error fetching sub places:", error);
       }
     };
-
+    
     fetchMainPlaces();
     fetchSubPlaces();
   }, []); // empty dependency array means this runs once on mount
@@ -271,19 +293,19 @@ const Places = () => {
                   <label className="inline-block mb-2 text-base font-medium">
                     مکان فرعی:
                     <div className="flex items-center gap-2">
-                    <PlusCircle onClick={openModalSubPalce} />
-                    <select
-                      value={formData.selectedSubPlace}
-                      onChange={handleSubPlaceChange}
-                      className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                    >
-                      <option value="">Select a main place</option>
-                      {mainPlaces.map((place) => (
-                        <option key={place.id} value={place.id}>
-                          {place.name}
-                        </option>
-                      ))}
-                    </select>
+                      <PlusCircle onClick={openModalSubPalce} />
+                      <select
+                        value={formData.selectedSubPlace}
+                        onChange={handleSubPlaceChange}
+                        className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                      >
+                        <option value="">Select a main place</option>
+                        {subPlaces.map((place) => (
+                          <option key={place.id} value={place.id}>
+                            {place.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </label>
                 </div>

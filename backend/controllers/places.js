@@ -62,7 +62,7 @@ const placesController = {
   deletePlace: async (req, res) => {
     try {
       const result = await placesService.deletePlace(req.params.id);
-      return res.status(200).json(result);
+      return res.status(200).json({data:result});
     } catch (error) {
       console.error(error);
       return res
@@ -78,7 +78,7 @@ class MainPlaceController {
   async create(req, res) {
     try {
       const mainPlace = await mainPlaceService.createMainPlace(req.body);
-      return res.status(201).json(mainPlace);
+      return res.status(201).json({data:mainPlace});
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
@@ -87,7 +87,7 @@ class MainPlaceController {
   async getAll(req, res) {
     try {
       const mainPlaces = await mainPlaceService.getAllMainPlaces();
-      return res.json(mainPlaces);
+      return res.json({data:mainPlaces});
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -99,7 +99,7 @@ class MainPlaceController {
       if (!mainPlace) {
         return res.status(404).json({ error: "MainPlace not found" });
       }
-      return res.json(mainPlace);
+      return res.json({data:mainPlace});
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -111,7 +111,7 @@ class MainPlaceController {
         req.params.id,
         req.body
       );
-      return res.json(mainPlace);
+      return res.json({data:mainPlace});
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
@@ -130,7 +130,7 @@ class SubPlaceController {
   async createSubPlace(req, res) {
     try {
       const newSubPlace = await subPlaceService.createsubPlace(req.body);
-      res.status(201).json(newSubPlace);
+      res.status(201).json({data:newSubPlace});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -139,7 +139,7 @@ class SubPlaceController {
   async getAllSubPlaces(req, res) {
     try {
       const subPlaces = await subPlaceService.getAllsubPlaces();
-      res.json(subPlaces);
+      res.json({data:subPlaces});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -149,7 +149,7 @@ class SubPlaceController {
     try {
       const subPlace = await subPlaceService.getsubPlaceById(req.params.id);
       if (!subPlace) return res.status(404).json({ error: 'SubPlace not found' });
-      res.json(subPlace);
+      res.json({data:subPlaces});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -158,7 +158,7 @@ class SubPlaceController {
   async updateSubPlace(req, res) {
     try {
       const updatedSubPlace = await subPlaceService.updatesubPlace(req.params.id, req.body);
-      res.json(updatedSubPlace);
+      res.json({data:updatedSubPlace});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -167,7 +167,7 @@ class SubPlaceController {
   async deleteSubPlace(req, res) {
     try {
       const result = await subPlaceService.deletesubPlace(req.params.id);
-      res.json(result);
+      res.json({data:result});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
