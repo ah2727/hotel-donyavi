@@ -4,10 +4,10 @@ class PersonController {
   // Create a new Person
   static async create(req, res) {
     try {
-      const { firstName, lastName, Position,Repairaccess, isActive } = req.body;
+      const { firstName, lastName,phoneNumber, Position,Repairaccess, isActive } = req.body;
 
       // Validate required fields
-      if (!firstName || !lastName || !Position || !Repairaccess  || !isActive) {
+      if (!firstName || !lastName || !Position || !Repairaccess  || !isActive ||!phoneNumber) {
         return res.status(400).json({ message: 'First name, last name, and email are required.' });
       }
 
@@ -15,6 +15,7 @@ class PersonController {
       const person = await PersonService.createPerson({
         firstName,
         lastName,
+        phoneNumber,
         Position,
         Repairaccess,
         isActive,

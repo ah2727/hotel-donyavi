@@ -6,6 +6,7 @@ export interface Person {
   id: number; // Primary key, auto-incremented
   firstName: string; // Non-nullable, must not be empty
   lastName: string; // Non-nullable, must not be empty
+  phoneNumber:string;
   Position?: string | null; // Nullable, must be a valid email if provided
   Repairaccess: boolean;
   isActive: boolean; // Defaults to true
@@ -23,6 +24,7 @@ const Persons = () => {
     firstName: "",
     lastName: "",
     Position: "",
+    phoneNumber:"",
     Repairaccess: "false",
     isActive: "true", // Default value for the dropdown
   });
@@ -82,6 +84,7 @@ const Persons = () => {
     setFormData({
       firstName: target.firstName,
       lastName: target.lastName,
+      phoneNumber:target.phoneNumber,
       Position: target.Position,
       Repairaccess: target.Repairaccess,
       isActive: target.isActive, // Default value for the dropdown
@@ -123,6 +126,7 @@ const Persons = () => {
         setFormData({
           firstName: "",
           lastName: "",
+          phoneNumber:"",
           Position: "",
           Repairaccess: "false",
           isActive: "true", // Default value for the dropdown
@@ -186,14 +190,14 @@ const Persons = () => {
               </div>
             </div>
             <div className="grid grid-cols-2">
-              <div className="mb-4 flex flex-col items-center">
+            <div className="mb-4 flex flex-col items-center">
                 <div className="flex flex-col items-start ">
                   <label className="inline-block mb-2 text-base font-medium">
-                    سمت:
+                    شماره تماس:
                   </label>
                   <input
-                    name="Position"
-                    value={formData.Position}
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
                     onChange={handleChange}
                     className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   ></input>
@@ -216,6 +220,20 @@ const Persons = () => {
                 </div>
               </div>
             </div>
+            <div className="grid grid-cols-2">
+            <div className="mb-4 flex flex-col items-center">
+              <div className="flex flex-col items-start ">
+                <label className="inline-block mb-2 text-base font-medium">
+                  سمت:
+                </label>
+                <input
+                  name="Position"
+                  value={formData.Position}
+                  onChange={handleChange}
+                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                ></input>
+              </div>
+            </div>
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">
                 <label className="inline-block mb-2 text-base font-medium">
@@ -231,6 +249,7 @@ const Persons = () => {
                   <option value="false">غیر فعال</option>
                 </select>
               </div>
+            </div>
             </div>
             <div className="mb-4 flex flex-col items-center">
               <div className="flex flex-col items-start ">

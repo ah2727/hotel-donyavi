@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "./Components/Modal";
-import { X } from 'lucide-react';
+import { useState } from "react";
+import { X, PlusCircle, EyeIcon } from "lucide-react";
 
 interface props {
   show: boolean;
@@ -8,6 +9,14 @@ interface props {
 }
 
 const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
+  const [isAdd, setIsAdd] = useState(false);
+
+  const handleIsAdd = () => {
+    setIsAdd(true);
+  };
+  const handleIsList = () => {
+    setIsAdd(false);
+  };
   return (
     <React.Fragment>
       <Modal
@@ -28,27 +37,17 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
             </button>
           </div>
           <div className="mt-5 text-center">
-            <h5 className="mb-1">Are you sure?</h5>
-            <p className="text-slate-500 dark:text-zink-200">
-              Are you certain you want to delete this record?
-            </p>
-            <div className="flex justify-center gap-2 mt-6">
-              <button
-                type="reset"
-                className="bg-white text-slate-500 btn hover:text-slate-500 hover:bg-slate-100 focus:text-slate-500 focus:bg-slate-100 active:text-slate-500 active:bg-slate-100 dark:bg-zink-600 dark:hover:bg-slate-500/10 dark:focus:bg-slate-500/10 dark:active:bg-slate-500/10"
-                onClick={onHide}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                id="deleteRecord"
-                data-modal-close="deleteModal"
-                className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
-              >
-                Yes, Delete It!
-              </button>
-            </div>
+            {isAdd ? (
+              <>
+                <EyeIcon onClick={handleIsList} />
+                <></>
+              </>
+            ) : (
+              <>
+                <PlusCircle onClick={handleIsAdd} />
+                <div className=""></div>
+              </>
+            )}
           </div>
         </Modal.Body>
       </Modal>

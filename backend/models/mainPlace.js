@@ -1,4 +1,4 @@
-// models/place.js
+
 const { Model, DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {

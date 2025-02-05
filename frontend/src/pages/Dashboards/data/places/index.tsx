@@ -248,7 +248,7 @@ const Places = () => {
                   <label className="inline-block mb-2 text-base font-medium">
                     مکان اصلی:
                   </label>
-                  <div className="flex">
+                  <div className="flex  items-center gap-2">
                     <PlusCircle onClick={openModalMainPalce} />
                     <select
                       value={formData.selectedMainPlace}
@@ -270,6 +270,7 @@ const Places = () => {
                 <div className="flex flex-col items-start ">
                   <label className="inline-block mb-2 text-base font-medium">
                     مکان فرعی:
+                    <div className="flex items-center gap-2">
                     <PlusCircle onClick={openModalSubPalce} />
                     <select
                       value={formData.selectedSubPlace}
@@ -283,6 +284,7 @@ const Places = () => {
                         </option>
                       ))}
                     </select>
+                    </div>
                   </label>
                 </div>
               </div>

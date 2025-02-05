@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import DeleteModal from "Common/DeleteModal";
 
-type Device = {
+type DeviceType = {
   id: number;
   name: string;
   brand: string;
@@ -12,365 +11,296 @@ type Device = {
   status: "active" | "inactive" | "retired";
 };
 
-type Equipment = {
-  id: number;
-  name: string;
-  serialNumber: string;
-  purchaseDate?: string;
-  equipmentTypeId?: number;
-  createdAt: string;
-  updatedAt: string;
-  devices: Device[]; // Associated devices
-};
-interface Place {
+type EquipmentType = {
   id: number;
   name: string;
   description: string;
-  address: string;
-}
-export type DeployedEquipment = {
-  id: number; // Primary key
-  status: "active" | "inactive" | "maintenance"; // Restrict to valid options
-  deploymentDate: string; // ISO format string
-  equipmentId: string; // Foreign key to Equipment
-  placeId: string; // Foreign key to Place
-  equipment?: Equipment; // Associated Equipment object (optional, for eager loading)
-  place?: Place; // Associated Place object (optional, for eager loading)
+  createdAt: string;
+  updatedAt: string;
 };
-const DEquipment = () => {
+
+type EquipmentFormData = {
+  id?: number; // Optional for new equipment (not required on creation)
+  name: string;
+  serialNumber: string;
+  purchaseDate?: string; // Date as an ISO string
+  equipmentTypeId?: number; // Foreign key for EquipmentType
+  selectedDevices: number[]; // Array of device IDs (for multiple selection)
+  placeId?: number;
+  guaranteeEnd:string;
+  Propertynumber:string;
+  description:string;
+};
+export interface Place {
+  id: string;
+  name: string;
+  description?: string | null;
+  address?: string | null;
+}
+const DefinEquipment = () => {
   const API_URL = process.env.REACT_APP_API_URL;
-  const [equipment, setEquipmnet] = useState<Equipment[]>([]);
+  const [devices, setDevices] = useState<DeviceType[]>([]);
+  const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
-  const [notification, setNotification] = useState(""); // State to store the notification message
-  const [selectedId, setSelectedId] = useState<number | null>(null); // Track the selected id
-  const [DEquipment, setDEquipment] = useState<DeployedEquipment[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
-  const [formData, setFormData] = useState({
-    equipmentId: "",
-    placeId: "",
-    status: "active",
-    deploymentDate: "",
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<EquipmentFormData>({
+    name: "",
+    serialNumber: "",
+    equipmentTypeId: undefined,
+    selectedDevices: [], // Store selected devices here
+    placeId: undefined,
+    guaranteeEnd:"",
+    Propertynumber:"",
+    description:""
   });
-  const fetchEquipment = async () => {
+
+  // Fetch devices from API
+  const fetchDevice = async () => {
     try {
-      // Fetch equipment data from the API
-      const response = await axios.get(`${API_URL}/equipment/equipment`);
-      setEquipmnet(response.data);
-    } catch (error) {
-      console.error("Error fetching equipment data:", error);
+      setLoading(true);
+      setError(null);
+      const response = await axios.get<DeviceType[]>(`${API_URL}/device/`);
+      setDevices(response.data);
+    } catch (err) {
+      console.error("Error fetching devices:", err);
+      setError("Failed to fetch devices. Please try again.");
     } finally {
+      setLoading(false);
     }
   };
-  const fetchPlaces = async () => {
+
+  // Fetch equipment types from API
+  const fetchEquipmentType = async () => {
     try {
-      // Fetch equipment data from the API
-      const response = await axios.get(`${API_URL}/places/`);
-      setPlaces(response.data);
-    } catch (error) {
-      console.error("Error fetching equipment data:", error);
-    } finally {
-    }
-  };
-  const fetchDEquipment = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/deployedEquipment/`); // Adjust the URL if necessary
-      console.log("Response Data:", response.data); // Debugging
-      setDEquipment(response.data); // Set the data into the state
+      setLoading(true);
+      setError(null);
+      const response = await axios.get<EquipmentType[]>(
+        `${API_URL}/equipment/equipment-types`
+      );
+      setEquipmentTypes(response.data);
     } catch (err) {
       console.error("Error fetching equipment types:", err);
+      setError("Failed to fetch equipment types. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchDEquipment();
-    fetchEquipment();
-    fetchPlaces();
-  }, []);
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData, // Spread the current form data
-      [name]: value, // Update the specific input field by name
-    });
+  const fetchPlaces = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/places`);
+      setPlaces(response.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
-  const handleSubmit = async (e: any) => {
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchPlaces();
+    fetchDevice();
+    fetchEquipmentType();
+  }, []);
+
+  // Handle form field changes (including multi-select for devices)
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    // Handle multiple device selection
+    if (name === "selectedDevices") {
+      const selectedOptions = Array.from(
+        (e.target as HTMLSelectElement).selectedOptions
+      ).map((option) => parseInt(option.value));
+      setFormData((prevState) => ({
+        ...prevState,
+        selectedDevices: selectedOptions,
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]:
+          name === "equipmentTypeId" ? parseInt(value) || undefined : value,
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API_URL}/deployedEquipment/`,
-        formData
-      );
-      if (response.data) {
-        setDEquipment((prevEquipmentTypes) => [
-          ...prevEquipmentTypes,
-          response.data, // Add the newly created equipment type
-        ]);
-        setFormData({
-          equipmentId: "",
-          placeId: "",
-          status: "active",
-          deploymentDate: "",
-        });
-        // If the response status is 201 (Created), show a notification
-        setNotification("تجهیزات مستقر با موفقیت ساخته شد");
-      } else {
-        setNotification("یک ارور ناشناخته از سرور.");
-      }
+      console.log("Submitting form data:", formData);
+      // Here you can send `formData` to your API
+      await axios.post(`${API_URL}/equipment/equipment`, formData);
+      alert("Equipment successfully created!");
     } catch (error) {
-      setNotification("Error creating Equipment Type. Please try again.");
-      console.error("Error:", error);
+      console.error("Error submitting form:", error);
+      alert("Failed to create equipment. Please try again.");
     }
   };
-  const openModal = (id: number) => {
-    setSelectedId(id);
-    setIsModalOpen(true);
-  };
 
-  // Close modal
-  const closeModal = () => {
-    setSelectedId(null);
-    setIsModalOpen(false);
-  };
-  const UpdateSet = (target: any) => {
-    setFormData({
-      equipmentId: target.equipmentId,
-      placeId: target.placeId,
-      status: target.status,
-      deploymentDate: target.deploymentDate,
-    });
-    setSelectedId(target.id);
-  };
-  const deleteDequipment = async () => {
-    if (selectedId === null) return;
-
-    await axios.delete(`${API_URL}/deployedEquipment/${selectedId}`);
-    const updatedList = DEquipment.filter(
-      (equipment) => equipment.id !== selectedId
-    );
-    setDEquipment(updatedList);
-    setIsModalOpen(false);
-    setSelectedId(null);
-  };
-  const update = async () => {
-    try {
-      if (selectedId === null) return; // Prevent proceeding if no ID is selected
-
-      // Send updated data to the API
-      const response = await axios.put(
-        `${API_URL}/deployedEquipment/${selectedId}`,
-        formData
-      );
-
-      if (response.data) {
-        // Update the local state with the updated device
-        const updatedList = DEquipment.map((equipment) =>
-          equipment.id === selectedId
-            ? {
-                ...equipment,
-                ...formData,
-                status: formData.status as "active" | "inactive" | "maintenance", // Type assertion
-
-              }
-            : equipment
-        );
-        // Reset the form and clear the selected ID
-        setFormData({
-          equipmentId: "",
-          placeId: "",
-          status: "active",
-          deploymentDate: "",
-        });
-        setSelectedId(null);
-
-        // Update the state with the modified list
-        setDEquipment(updatedList);
-
-        // Optional: Show a success notification
-        setNotification("DEquipment updated successfully!");
-      }
-    } catch (error) {
-      console.error("Failed to update the DEquipment:", error);
-
-      // Optional: Show an error notification
-      setNotification("Failed to update the DEquipment. Please try again.");
-    } finally {
-      // Optional: Clear notifications after 3 seconds
-      setTimeout(() => {
-        setNotification("");
-      }, 3000);
-    }
-  };
   return (
     <React.Fragment>
-      {notification && (
-        <div className="px-4 py-3 text-sm bg-white border rounded-md border-custom-300 text-custom-500 dark:bg-zink-700 dark:border-custom-500">
-          {notification}
-        </div>
-      )}
       <div className="card mt-10">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  فعال:
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                >
-                  <option value="active">فعال</option>
-                  <option value="Inactive">غیر فعال</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    نام دستگاه:
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  />
+                </div>
+                <div className="mb-4 flex flex-col items-center">
+                  <div className="flex flex-col items-start">
+                    <label className="inline-block mb-2 text-base font-medium">
+                      سریال نامبر:
+                    </label>
+                    <input
+                      type="text"
+                      name="serialNumber"
+                      value={formData.serialNumber}
+                      onChange={handleChange}
+                      className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  تاریخ مستقر شدن:
-                </label>
-                <input
-                  type="date"
-                  name="deploymentDate"
-                  value={formData.deploymentDate}
-                  onChange={handleChange}
-                  className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                ></input>
+            <div className="grid gap-4 grid-cols-2 mt-5">
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    محل:
+                  </label>
+                  <select
+                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    name="placeId"
+                    value={formData.placeId || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      انتخاب کنید
+                    </option>
+                    {places.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    نوع تجهیزات:
+                  </label>
+                  <select
+                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    name="equipmentTypeId"
+                    value={formData.equipmentTypeId || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      انتخاب کنید
+                    </option>
+                    {equipmentTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  تجهیزات:
-                </label>
-                <select
-                  name="equipmentId"
-                  value={formData.equipmentId}
-                  onChange={handleChange}
-                  className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                >
-                  <option value="" disabled>
-                    -- Select Equipment --
-                  </option>
-                  {equipment.map((equipment) => (
-                    <option key={equipment.id} value={equipment.id}>
-                      {equipment.name} {/* Display the name of the equipment */}
-                    </option>
-                  ))}
-                </select>
+            <div className="grid grid-cols-2 mt-5">
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    نوع دستگاه:
+                  </label>
+                  <select
+                    multiple
+                    name="selectedDevices"
+                    value={formData.selectedDevices.map(String)} // Convert to string for the `value` attribute
+                    onChange={handleChange}
+                    className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  >
+                    {devices.map((device) => (
+                      <option key={device.id} value={device.id}>
+                        {device.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="flex flex-col items-start ">
-                <label className="inline-block mb-2 text-base font-medium">
-                  محل:
-                </label>
-                <select
-                  name="placeId"
-                  value={formData.placeId}
-                  onChange={handleChange}
-                  className="form-select  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                >
-                  <option value="" disabled>
-                    -- Select place --
-                  </option>
-                  {places.map((place) => (
-                    <option key={place.id} value={place.id}>
-                      {place.name} {/* Display the name of the equipment */}
-                    </option>
-                  ))}
-                </select>
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    تاریخ اتمام گارانتی:
+                  </label>
+                  <input
+                    type="date"
+                    name="guaranteeEnd"
+                    value={formData.guaranteeEnd}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200" />
+                </div>
               </div>
             </div>
 
-            <div className="mb-4 flex flex-col items-center">
-              <div className="flex flex-col items-start ">
-                {selectedId ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={update}
-                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                    >
-                      آپدیت
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="submit"
-                      className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
-                    >
-                      تایید
-                    </button>
-                  </>
-                )}
+            <div className="grid grid-cols-2 mt-5">
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    شماره اموال:
+                  </label>
+                    <input type="text" 
+                    name="Propertynumber"
+                    value={formData.Propertynumber}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200" />
+               
+                </div>
               </div>
+              <div className="mb-4 flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  <label className="inline-block mb-2 text-base font-medium">
+                    توضیحات:
+                  </label>
+                  <input
+                    type="text"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200" />
+                </div>
+              </div>
+            </div>
+            <div className="mb-4 flex flex-col items-center">
+
+            <div className="mb-4 flex flex-col items-center">
+              <button
+                type="submit"
+                className="text-white btn bg-custom-500 hover:bg-custom-600"
+              >
+                تایید
+              </button>
+            </div>
+            
             </div>
           </form>
         </div>
       </div>
-      <div className="card mt-2">
-        <div className="card-body">
-          <table className="w-full whitespace-nowrap">
-            <thead>
-              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                نام انبار
-              </th>
-              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                حجم انبار
-              </th>
-              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                آدرس
-              </th>
-
-              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                عملیات
-              </th>
-            </thead>
-
-            <tbody className="list form-check-all">
-              {DEquipment.map((equipment: any) => (
-                <tr>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {equipment.status}
-                  </td>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {equipment.quantity}
-                  </td>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    {equipment.location}
-                  </td>
-                  <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => UpdateSet(equipment)}
-                        className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
-                      >
-                        آپدیت
-                      </button>
-                      <button
-                        onClick={() => openModal(equipment.id)}
-                        className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
-                      >
-                        حذف
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <DeleteModal
-          show={isModalOpen}
-          onDelete={() => deleteDequipment()}
-          onHide={closeModal}
-        ></DeleteModal>
-      </div>
     </React.Fragment>
   );
 };
-export default DEquipment;
+
+export default DefinEquipment;

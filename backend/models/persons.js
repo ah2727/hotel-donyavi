@@ -25,6 +25,10 @@ module.exports = (sequelize) => {
           notEmpty: true, // Ensure it's not empty
         },
       },
+      phoneNumber:{
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       Position: {
         type: DataTypes.STRING,
       },
