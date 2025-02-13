@@ -49,7 +49,7 @@ const menuData: any = [
             },
             {
                 id: 'emaildashboard',
-                label: 'نوع تغییر',
+                label: 'نوع تعمیر',
                 link: '/Typeofchange',
                 parentId: "data"
             },

@@ -12,7 +12,8 @@ const initSubplaces = require("./subPlace")
 const PersonModel = require('./persons')
 const initPlace = require('./places')
 const DeployedEquipmentModel = require('./DeployedEquipment');
-
+const RepairType = require("./repairType");
+const RepairTypeType = require("./repairTypeType");
 
 const Person = PersonModel(sequelize); // Pass sequelize instance to the model
 const Place = initPlace(sequelize);
@@ -96,6 +97,16 @@ Place.hasOne(subPlace, {
 subPlace.belongsTo(Place, {
   foreignKey: 'placeId',
   as: 'place'
+});
+RepairType.belongsTo(RepairTypeType, { 
+  foreignKey: "repairTypeTypeId", 
+  as: "repairTypeType" 
+});
+
+// Each RepairTypeType can have many RepairTypes
+RepairTypeType.hasMany(RepairType, { 
+  foreignKey: "repairTypeTypeId", 
+  as: "repairTypes" 
 });
 
 // Export models and sequelize instance
