@@ -122,5 +122,7 @@ module.exports = {
   Equipment,
   DeployedEquipment,
   MainPlace,
-  subPlace
+  subPlace,
+  RepairTypeType,
+  RepairType
 };

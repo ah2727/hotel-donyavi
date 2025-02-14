@@ -6,7 +6,7 @@ import Persons from "pages/Dashboards/data/persons";
 import Places from "pages/Dashboards/data/places";
 import TechnicalWarehouse from "pages/Dashboards/data/Technicalwarehouse";
 import DEquipment from "pages/Dashboards/data/DEquipment";
-import Typeofchange from "pages/Dashboards/data/Typeofchange";
+import Typeofchange from "pages/Dashboards/data/TypeofRepair";
 import TypeEquipment from "pages/Dashboards/data/TypeEquipment";
 import TypeDevice from "pages/Dashboards/data/TypeDevice";
 import Users from "pages/Dashboards/data/user/user";
@@ -47,7 +47,7 @@ const authProtectedRoutes: Array<RouteObject> = [
   { path: "/places", component: Places },
   { path: "/Technicalwarehouse", component: TechnicalWarehouse },
   { path: "/DEquipment", component: DEquipment },
-  { path: "/Typeofchange", component: Typeofchange },
+  { path: "/TypeofRepair", component: Typeofchange },
   { path: "/TypeEquipment", component: TypeEquipment },
   { path: "/TypeDevice", component: TypeDevice },
   { path: "/users", component: Users },

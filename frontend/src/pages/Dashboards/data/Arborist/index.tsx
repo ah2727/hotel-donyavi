@@ -115,11 +115,7 @@ const Arborist: React.FC = () => {
   // Handle click on a node.
   // For equipment types, navigate to their detail page.
   const handleClick = (node: EquipmentTreeNode) => {
-    if (node.isEquipmentType) {
-      navigate(`/EquipmentTypeDetail/${node.id}`);
-    } else {
-      console.log("Clicked on an equipment item", node);
-    }
+
   };
 
   // Hide context menu when clicking outside.
@@ -164,7 +160,6 @@ const Arborist: React.FC = () => {
             {({ node, style }: { node: NodeApi<EquipmentTreeNode>; style: React.CSSProperties }) => (
               <div
                 style={style}
-                onClick={() => handleClick(node.data)}
                 onContextMenu={(e) => handleRightClick(e, node.data)}
               >
                 {node.data.name}{" "}
@@ -192,6 +187,27 @@ const Arborist: React.FC = () => {
                 boxShadow: "2px 2px 6px rgba(0,0,0,0.2)",
               }}
             >
+              <div
+                className="context-menu-item"
+                onClick={() => {
+                  console.log("Delete option clicked for", contextMenu.node);
+                  // If a node is selected, send a DELETE request to delete it.
+                  if (contextMenu.node) {
+                    axios
+                      .delete(`${API_URL}/equipment/equipment/${contextMenu.node.id}`)
+                      .then(() => {
+                        // After successful deletion, refresh the tree data.
+                        fetchEquipment();
+                      })
+                      .catch((err) => {
+                        console.error("Error deleting equipment:", err);
+                      });
+                  }
+                  setContextMenu({ ...contextMenu, visible: false });
+                }}
+              >
+                Delete
+              </div>
               <div
                 className="context-menu-item"
                 onClick={() => {

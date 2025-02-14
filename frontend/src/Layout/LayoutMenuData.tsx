@@ -36,12 +36,6 @@ const menuData: any = [
                 parentId: "data"
             },
             {
-                id: 'hrdashboard',
-                label: 'انبار فنی',
-                link: '/Technicalwarehouse',
-                parentId: "data"
-            },
-            {
                 id: 'socialdashboard',
                 label: 'تعریف تجهیزات مستقر',
                 link: '/DEquipment',
@@ -50,7 +44,7 @@ const menuData: any = [
             {
                 id: 'emaildashboard',
                 label: 'نوع تعمیر',
-                link: '/Typeofchange',
+                link: '/TypeofRepair',
                 parentId: "data"
             },
             {
