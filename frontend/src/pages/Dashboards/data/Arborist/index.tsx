@@ -22,7 +22,7 @@ export interface EquipmentRecord {
   createdAt: string;
   updatedAt: string;
   placeId: string | null;
-  equipmentType: EquipmentTypeData; // Add this property
+  equipmentType: EquipmentTypeData; // This property is returned by the API.
 }
 
 export interface EquipmentTreeNode {
@@ -34,13 +34,13 @@ export interface EquipmentTreeNode {
   description?: string;
 }
 
-const Arborist = () => {
+const Arborist: React.FC = () => {
   const navigate = useNavigate();
   const [treeData, setTreeData] = useState<EquipmentTreeNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Declare contextMenu state
+  // Declare contextMenu state.
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
@@ -55,21 +55,22 @@ const Arborist = () => {
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-  // Fetch equipment data, group by equipmentType.id, and update parent's name using the equipment-types endpoint.
+  // Fetch equipment data and group it into a tree structure.
   const fetchEquipment = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch all equipment records.
-      const response = await axios.get<EquipmentRecord[]>(
+      // The API is expected to return: { data: EquipmentRecord[] }
+      const response = await axios.get(
         `${API_URL}/equipment/get-arborist`
       );
+      const records: EquipmentRecord[] = response.data;
 
       // Group equipment records by equipmentType.id.
       const equipmentGroups: { [key: number]: EquipmentTreeNode } = {};
-      console.log(response)
-      response.data.forEach((item) => {
+
+      records.forEach((item) => {
         const eqType = item.equipmentType;
         if (!equipmentGroups[eqType.id]) {
           equipmentGroups[eqType.id] = {
@@ -89,7 +90,7 @@ const Arborist = () => {
         });
       });
 
-      // Convert the groups into an array for the tree.
+      // Convert the groups into an array.
       const finalTree: EquipmentTreeNode[] = Object.values(equipmentGroups);
       setTreeData(finalTree);
     } catch (err: any) {
@@ -100,8 +101,7 @@ const Arborist = () => {
     }
   };
 
-  // Define handleRightClick to set contextMenu state.
-  // Notice that we pass node.data here.
+  // Handle right-click on a node.
   const handleRightClick = (e: MouseEvent, node: EquipmentTreeNode) => {
     e.preventDefault();
     setContextMenu({
@@ -110,6 +110,16 @@ const Arborist = () => {
       y: e.clientY,
       node: node,
     });
+  };
+
+  // Handle click on a node.
+  // For equipment types, navigate to their detail page.
+  const handleClick = (node: EquipmentTreeNode) => {
+    if (node.isEquipmentType) {
+      navigate(`/EquipmentTypeDetail/${node.id}`);
+    } else {
+      console.log("Clicked on an equipment item", node);
+    }
   };
 
   // Hide context menu when clicking outside.
@@ -154,6 +164,7 @@ const Arborist = () => {
             {({ node, style }: { node: NodeApi<EquipmentTreeNode>; style: React.CSSProperties }) => (
               <div
                 style={style}
+                onClick={() => handleClick(node.data)}
                 onContextMenu={(e) => handleRightClick(e, node.data)}
               >
                 {node.data.name}{" "}
@@ -175,7 +186,7 @@ const Arborist = () => {
                 position: "absolute",
                 top: contextMenu.y,
                 left: contextMenu.x,
-                backgroundColor: "#fff",
+                backgroundColor: "#darkblue",
                 border: "1px solid #ccc",
                 zIndex: 1000,
                 boxShadow: "2px 2px 6px rgba(0,0,0,0.2)",
@@ -184,18 +195,15 @@ const Arborist = () => {
               <div
                 className="context-menu-item"
                 onClick={() => {
-                  console.log("New option clicked for", contextMenu.node);
-                  // TODO: Implement New option functionality.
-                  setContextMenu({ ...contextMenu, visible: false });
-                }}
-              >
-                New
-              </div>
-              <div
-                className="context-menu-item"
-                onClick={() => {
                   console.log("Add option clicked for", contextMenu.node);
-                  // TODO: Implement Add option functionality.
+                  // Check if the clicked node is an equipment type.
+                  if (contextMenu.node?.isEquipmentType) {
+                    // Navigate to add an equipment type.
+                    navigate("/TypeEquipment");
+                  } else {
+                    // Otherwise, navigate to add an equipment item.
+                    navigate("/DefinEquipment");
+                  }
                   setContextMenu({ ...contextMenu, visible: false });
                 }}
               >
