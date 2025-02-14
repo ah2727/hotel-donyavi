@@ -1,7 +1,30 @@
 const EquipmentType = require("../models/EquipmentType");
 const Equipment = require("../models/Equipment");
-const Device = require("../models/Device")
+const Device = require("../models/Device");
+
 class EquipmentService {
+  static async getEquipmentWithAssociations() {
+    try {
+      const equipments = await Equipment.findAll({
+        include: [
+          {
+            model: EquipmentType,
+            as: "equipmentType",
+            include: [
+              {
+                model: Device,
+                as: "deviceType",
+              },
+            ],
+          },
+        ],
+      });
+      return equipments;
+    } catch (error) {
+      console.error("Error fetching equipments with associations:", error);
+      throw error;
+    }
+  }
   // Create a new Equipment
   static async createEquipment(data) {
     const { selectedDevices, ...equipmentData } = data; // Extract devices and other data
@@ -166,4 +189,4 @@ class EquipmentTypeService {
   }
 }
 
-module.exports ={ EquipmentTypeService, EquipmentService}
+module.exports = { EquipmentTypeService, EquipmentService };

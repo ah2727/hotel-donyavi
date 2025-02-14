@@ -5,6 +5,7 @@ const deviceRoutes = require('./routes/device');
 const placesRoutes = require('./routes/places');
 const technicalWarehouseRoutes = require('./routes/Technicalwarehouse')
 const deployedEquipmentRoutes = require('./routes/DeployedEquipment');
+const repairType = require('./routes/repairType');
 
 
 const cors = require("cors");
@@ -29,6 +30,7 @@ app.use('/device', deviceRoutes);
 app.use('/places', placesRoutes); // Mount /places routes
 app.use('/technicalWarehouse', technicalWarehouseRoutes);
 app.use('/deployedEquipment', deployedEquipmentRoutes);
+app.use('/repairType', repairType);
 
 
 

@@ -1,6 +1,6 @@
 const express = require("express");
-const {EquipmentTypeController} = require("../controllers/Equipment");
-const {EquipmentController} = require("../controllers/Equipment");
+const { EquipmentTypeController } = require("../controllers/Equipment");
+const { EquipmentController } = require("../controllers/Equipment");
 
 const router = express.Router();
 
@@ -9,6 +9,8 @@ router.post("/equipment-types", EquipmentTypeController.create);
 
 // Retrieve all EquipmentTypes
 router.get("/equipment-types", EquipmentTypeController.getAll);
+
+router.get("/get-arborist", (req, res) => EquipmentController.fetchEquipment(req, res));
 
 // Retrieve an EquipmentType by ID
 router.get("/equipment-types/:id", EquipmentTypeController.getById);

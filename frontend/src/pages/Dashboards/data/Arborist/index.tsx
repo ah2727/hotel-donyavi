@@ -1,35 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tree } from "react-arborist";
+import { Tree, NodeApi } from "react-arborist";
 import axios from "axios";
 
-// Base tree node type for react-arborist.
-type TreeNodeType = {
-  id: number | string; // Unique identifier
-  name: string;        // Display name
-  isLeaf: boolean;     // Whether this node is a leaf
-  children?: TreeNodeType[]; // Nested children (if any)
-};
+// types.ts
+export interface EquipmentTypeData {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  deviceTypeId: number | null;
+  deviceType: any; // Update this type if you have a proper DeviceType interface
+}
 
-// Raw equipment record from your API
-interface EquipmentRecord {
+export interface EquipmentRecord {
   id: number;
   name: string;
   equipmentTypeId: number;
+  description: string;
   createdAt: string;
   updatedAt: string;
   placeId: string | null;
-  serialNumber: string;
-  guaranteeEnd: string | null;
-  Propertynumber: string | null;
-  description: string | null;
-  deviceId: number | null; // (Ignored in this grouping)
+  equipmentType: EquipmentTypeData; // Add this property
 }
 
-// A tree node for equipment. (Used for both equipment type and equipment nodes.)
-interface EquipmentTreeNode extends TreeNodeType {
-  equipmentTypeId: number;
-  children: EquipmentTreeNode[]; // Always have a children array (may be empty)
+export interface EquipmentTreeNode {
+  id: number;
+  name: string;
+  children: EquipmentTreeNode[];
+  isEquipmentType?: boolean;
+  isEquipment?: boolean;
+  description?: string;
 }
 
 const Arborist = () => {
@@ -38,9 +40,22 @@ const Arborist = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Declare contextMenu state
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    node: EquipmentTreeNode | null;
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+    node: null,
+  });
+
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-  // Fetch equipment data, group by equipmentTypeId, and update the parent's name using the equipment-types endpoint.
+  // Fetch equipment data, group by equipmentType.id, and update parent's name using the equipment-types endpoint.
   const fetchEquipment = async () => {
     try {
       setLoading(true);
@@ -48,60 +63,36 @@ const Arborist = () => {
 
       // Fetch all equipment records.
       const response = await axios.get<EquipmentRecord[]>(
-        `${API_URL}/equipment/equipment`
+        `${API_URL}/equipment/get-arborist`
       );
 
-      // Group equipment records by equipmentTypeId.
+      // Group equipment records by equipmentType.id.
       const equipmentGroups: { [key: number]: EquipmentTreeNode } = {};
-
-      response.data.forEach((record) => {
-        // If we haven't created a parent node for this equipment type yet, do so.
-        if (!equipmentGroups[record.equipmentTypeId]) {
-          equipmentGroups[record.equipmentTypeId] = {
-            id: `equipment-type-${record.equipmentTypeId}`,
-            // Set a default name; this will be updated after fetching the equipment type details.
-            name: `Equipment Type ${record.equipmentTypeId}`,
-            equipmentTypeId: record.equipmentTypeId,
-            isLeaf: false,
+      console.log(response)
+      response.data.forEach((item) => {
+        const eqType = item.equipmentType;
+        if (!equipmentGroups[eqType.id]) {
+          equipmentGroups[eqType.id] = {
+            id: eqType.id,
+            name: eqType.name,
             children: [],
+            isEquipmentType: true,
           };
         }
-        // Create a node for the equipment record.
-        const equipmentNode: EquipmentTreeNode = {
-          id: `equipment-${record.id}`,
-          name: record.name,
-          equipmentTypeId: record.equipmentTypeId,
-          isLeaf: true,
+        // Add the equipment item as a child node.
+        equipmentGroups[eqType.id].children.push({
+          id: item.id,
+          name: item.name,
+          description: item.description,
           children: [],
-        };
-
-        // Add the equipment record node as a child of its corresponding equipment type node.
-        equipmentGroups[record.equipmentTypeId].children.push(equipmentNode);
+          isEquipment: true,
+        });
       });
-
-      // For each unique equipmentTypeId, fetch the equipment type details.
-      const equipmentTypeIds = Object.keys(equipmentGroups);
-      await Promise.all(
-        equipmentTypeIds.map(async (typeIdStr) => {
-          const typeId = Number(typeIdStr);
-          try {
-            const typeResponse = await axios.get(
-              `${API_URL}/equipment/equipment-types/${typeId}`
-            );
-            // Assume the response returns an object with a "name" property.
-            equipmentGroups[typeId].name =
-              typeResponse.data.name || equipmentGroups[typeId].name;
-          } catch (err) {
-            console.error(`Failed to fetch equipment type ${typeId}`, err);
-            // If the API call fails, the node will retain its default name.
-          }
-        })
-      );
 
       // Convert the groups into an array for the tree.
       const finalTree: EquipmentTreeNode[] = Object.values(equipmentGroups);
       setTreeData(finalTree);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching equipment data:", err);
       setError("Failed to fetch equipment data. Please try again.");
     } finally {
@@ -109,10 +100,30 @@ const Arborist = () => {
     }
   };
 
-  // Fetch data when the component mounts.
+  // Define handleRightClick to set contextMenu state.
+  // Notice that we pass node.data here.
+  const handleRightClick = (e: MouseEvent, node: EquipmentTreeNode) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      node: node,
+    });
+  };
+
+  // Hide context menu when clicking outside.
+  const handleClickOutside = () => {
+    if (contextMenu.visible) {
+      setContextMenu({ ...contextMenu, visible: false });
+    }
+  };
+
   useEffect(() => {
     fetchEquipment();
-  }, []);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, [contextMenu.visible]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -139,45 +150,62 @@ const Arborist = () => {
       </div>
       <div className="card mt-2">
         <div className="card-body flex justify-center">
-          <Tree
-            data={treeData}
-            idAccessor="id"
-            childrenAccessor="children"
-            openByDefault={true}
-            width={600}
-            height={400}
-            rowHeight={30}
-          >
-            {NodeRenderer}
+          <Tree<EquipmentTreeNode> data={treeData} childrenAccessor="children">
+            {({ node, style }: { node: NodeApi<EquipmentTreeNode>; style: React.CSSProperties }) => (
+              <div
+                style={style}
+                onContextMenu={(e) => handleRightClick(e, node.data)}
+              >
+                {node.data.name}{" "}
+                {node.data.isEquipment ? (
+                  <span style={{ fontStyle: "italic", color: "#666" }}>
+                    (Equipment)
+                  </span>
+                ) : (
+                  <span style={{ fontWeight: "bold" }}>(Type)</span>
+                )}
+              </div>
+            )}
           </Tree>
+
+          {contextMenu.visible && (
+            <div
+              className="context-menu"
+              style={{
+                position: "absolute",
+                top: contextMenu.y,
+                left: contextMenu.x,
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+                zIndex: 1000,
+                boxShadow: "2px 2px 6px rgba(0,0,0,0.2)",
+              }}
+            >
+              <div
+                className="context-menu-item"
+                onClick={() => {
+                  console.log("New option clicked for", contextMenu.node);
+                  // TODO: Implement New option functionality.
+                  setContextMenu({ ...contextMenu, visible: false });
+                }}
+              >
+                New
+              </div>
+              <div
+                className="context-menu-item"
+                onClick={() => {
+                  console.log("Add option clicked for", contextMenu.node);
+                  // TODO: Implement Add option functionality.
+                  setContextMenu({ ...contextMenu, visible: false });
+                }}
+              >
+                Add
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
-  );
-};
-
-// Custom node renderer for react-arborist.
-const NodeRenderer = <T extends TreeNodeType>({
-  node,
-  style,
-}: {
-  node: { data: T; isLeaf: boolean; toggle: () => void; isOpen: boolean };
-  style: React.CSSProperties;
-}) => {
-  return (
-    <div
-      style={style}
-      className="cursor-pointer flex items-center"
-      onClick={() => node.toggle()}
-    >
-      {node.isLeaf ? (
-        <span>📱 {node.data.name}</span>
-      ) : (
-        <span>
-          {node.isOpen ? "📂" : "📁"} {node.data.name}
-        </span>
-      )}
-    </div>
   );
 };
 

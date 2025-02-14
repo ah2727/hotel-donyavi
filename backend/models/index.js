@@ -44,15 +44,16 @@ EquipmentType.hasMany(Equipment, {
   as: "equipments",
 });
 
-// Define the association between Equipment and Device
-// Relationships
-Equipment.belongsTo(Device, {
-  foreignKey: "deviceId", // Foreign key in Device
-  as: "devices", // Alias for accessing related Devices
+// Association: EquipmentType belongs to DeviceType
+EquipmentType.belongsTo(Device, {
+  foreignKey: "deviceTypeId",
+  as: "deviceType",
 });
-Device.hasMany(Equipment, {
-  foreignKey: "deviceId", // Foreign key in Device
-  as: "equipment", // Alias for accessing the related Equipment
+
+// Association: DeviceType has many EquipmentType
+Device.hasMany(EquipmentType, {
+  foreignKey: "deviceTypeId",
+  as: "equipmentTypes",
 });
 
 

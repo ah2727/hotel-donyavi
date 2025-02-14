@@ -33,7 +33,15 @@ class EquipmentController {
       });
     }
   }
-
+  static async fetchEquipment(req, res) {
+    try {
+      const equipments = await EquipmentService.getEquipmentWithAssociations();
+      return res.status(200).json({data:equipments});
+    } catch (error) {
+      console.error("Error in fetchEquipment controller:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  }
   // Retrieve all Equipment
   static async getAll(req, res) {
     try {
