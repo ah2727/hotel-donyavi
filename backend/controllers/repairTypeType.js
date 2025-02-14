@@ -5,7 +5,7 @@ class RepairTypeTypeController {
   async createRepairTypeType(req, res) {
     try {
       const repairTypeType = await repairTypeTypeService.createRepairTypeType(req.body);
-      return res.status(201).json(repairTypeType);
+      return res.status(201).json({data:repairTypeType});
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message });
@@ -40,7 +40,7 @@ class RepairTypeTypeController {
     try {
       const { id } = req.params;
       const repairTypeType = await repairTypeTypeService.updateRepairTypeType(id, req.body);
-      return res.status(200).json(repairTypeType);
+      return res.status(200).json({data:repairTypeType});
     } catch (error) {
       console.error(error);
       if (error.message === "RepairTypeType not found") {

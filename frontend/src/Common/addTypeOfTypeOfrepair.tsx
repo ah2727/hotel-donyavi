@@ -14,15 +14,14 @@ export type PlaceOption = {
   address: string;
 };
 
-const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
+const AddTypeOfChangeModal: React.FC<props> = ({ show, onHide }) => {
   const API_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const [isAdd, setIsAdd] = useState(false);
-  const [MainPlace, setMainPlace] = useState<PlaceOption[]>([]);
+  const [Types, setTypes] = useState<PlaceOption[]>([]);
   const [formData, setFormData] = useState({
-    name: "",
-    address: "",
+    typeName: "",
     description: "",
   });
   const [selectedId, setSelectedId] = useState(null);
@@ -41,16 +40,13 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
     setIsAdd(false);
   };
   useEffect(() => {
-    async function getPlace() {
-      const response = await axios.get(`${API_URL}/places/mainplace/`);
-      setMainPlace(response.data);
-    }
-    getPlace();
+    axios.get(`${API_URL}/repairTypeType`).then((response) => {
+      setTypes(response.data);
+    });
   }, []);
   const UpdateSet = (target: any) => {
     setFormData({
-      name: target.name,
-      address: target.address,
+      typeName: target.typeName,
       description: target.description,
     });
     setSelectedId(target.id);
@@ -62,31 +58,31 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
 
       // Send updated data to the API
       const response = await axios.put(
-        `${API_URL}/places/mainplace/${selectedId}`,
+        `${API_URL}/repairTypeType/${selectedId}`,
         formData
       );
 
       if (response.data) {
         // Update the local state with the updated device
-        const updatedList = MainPlace.map((place) =>
-          place.id === selectedId
+        const updatedList = Types.map((type) =>
+          type.id === selectedId
             ? {
-                ...place,
+                ...type,
                 ...formData,
               }
-            : place
+            : type
         );
         // Reset the form and clear the selected ID
         setFormData({
-          name: "",
-          address: "",
+          typeName: "",
           description: "",
         });
         setSelectedId(null);
 
         // Update the state with the modified list
-        setMainPlace(updatedList);
+        setTypes(updatedList);
         setIsAdd(false); // Switch back to the list view
+        
         // Optional: Show a success notification
       }
     } catch (error) {
@@ -96,13 +92,11 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
   const HandlCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/places/mainplace/`, formData);
-      setMainPlace((prevMainPlaces) => [...prevMainPlaces, response.data]);
-
+      const response = await axios.post(`${API_URL}/repairTypeType/`, formData);
+      setTypes((prevMainPlaces) => [...prevMainPlaces, response.data]);
 
       setFormData({
-        name: "",
-        address: "",
+        typeName: "",
         description: "",
       });
       setIsAdd(false);
@@ -113,8 +107,8 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
   };
   const HandlDelete = async (id: number) => {
     try {
-      await axios.delete(`${API_URL}/places/mainplace/${id}`);
-      setMainPlace(MainPlace.filter((place: any) => place.id !== id));
+      await axios.delete(`${API_URL}/repairTypeType/${id}`);
+      setTypes(Types.filter((place: any) => place.id !== id));
     } catch {
       console.log("error");
     }
@@ -149,24 +143,11 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
                         نام:
                       </label>
                       <input
-                        name="name"
-                        value={formData.name}
+                        name="typeName"
+                        value={formData.typeName}
                         onChange={handleChange}
                         className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                       ></input>
-                    </div>
-                    <div className="mb-4 flex flex-col items-center">
-                      <div className="flex flex-col items-start ">
-                        <label className="inline-block mb-2 text-base font-medium">
-                          آدرس:
-                        </label>
-                        <input
-                          name="address"
-                          value={formData.address}
-                          onChange={handleChange}
-                          className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                        ></input>
-                      </div>
                     </div>
                     <div className="mb-4 flex flex-col items-center">
                       <div className="flex flex-col items-start ">
@@ -223,27 +204,25 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
                     </th>
                   </thead>
                   <tbody className="list form-check-all">
-                    {MainPlace?.map((place: any) => (
+                    {Types?.map((type: any) => (
                       <tr>
                         <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                          {place.name}
+                          {type.typeName}
                         </td>
+         
                         <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                          {place.address}
-                        </td>
-                        <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
-                          {place.description}
+                          {type.description}
                         </td>
                         <td className="px-3.5 py-2.5 border-y border-slate-200 dark:border-zink-500 id text-center">
                           <div className="flex gap-2 justify-center">
                             <button
-                              onClick={() => UpdateSet(place)}
+                              onClick={() => UpdateSet(type)}
                               className="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-sky-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-sky-600 active:ring active:ring-sky-100 dark:ring-sky-400/20"
                             >
                               آپدیت
                             </button>
                             <button
-                              onClick={() => HandlDelete(place.id)}
+                              onClick={() => HandlDelete(type.id)}
                               className="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20"
                             >
                               حذف
@@ -262,4 +241,4 @@ const AddMainPlaceModal: React.FC<props> = ({ show, onHide }) => {
     </React.Fragment>
   );
 };
-export default AddMainPlaceModal;
+export default AddTypeOfChangeModal;

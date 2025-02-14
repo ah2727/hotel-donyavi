@@ -46,6 +46,9 @@ const Typeofchange = () => {
   };
   const closeModalMainPlace = () => {
     setIsModalOpenMainPlace(false);
+    axios.get(`${API_URL}/repairTypeType`).then((response) => {
+        setTypes(response.data);
+      });
   }
   return (
     <React.Fragment>
@@ -98,10 +101,10 @@ const Typeofchange = () => {
           <table className="w-full whitespace-nowrap">
             <thead>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
-                نام نوع تجهیزات
+                نام تعمیر
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
-                توضیحات
+                نام نوع تعمیر
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 عملیات
