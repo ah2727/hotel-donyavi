@@ -95,13 +95,13 @@ const Typeofchange = () => {
     }
   };
   useEffect(() => {
-    axios.get(`${API_URL}/repairTypeType`).then((response) => {
-      setRepairTypeTypes(response.data);
+    axios.get(`${API_URL}/repairType`).then((response) => {
+      setTypes(response.data);
     });
   }, []);
   useEffect(() => {
     axios.get(`${API_URL}/repairTypeType`).then((response) => {
-      setTypes(response.data);
+      setRepairTypeTypes(response.data);
     });
   }, []);
   const openModalMainPalce = () => {
@@ -132,7 +132,7 @@ const Typeofchange = () => {
   const deleterepairType = async () => {
     if (selectedId === null) return;
 
-    await axios.delete(`${API_URL}/repairTypeType/${selectedId}`);
+    await axios.delete(`${API_URL}/repairType/${selectedId}`);
     const updatedList = types.filter((type) => type.id !== selectedId);
     setTypes(updatedList);
     setIsModalOpen(false);
@@ -241,6 +241,9 @@ const Typeofchange = () => {
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500 text-center">
                 نام نوع تعمیر
+              </th>
+              <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
+                عملیات
               </th>
               <th className="sort px-3.5 py-2.5 font-semibold border-b border-slate-200 dark:border-zink-500  text-center">
                 عملیات

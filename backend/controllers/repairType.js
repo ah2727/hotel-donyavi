@@ -15,7 +15,7 @@ class RepairTypeController {
   async getRepairTypes(req, res) {
     try {
       const repairTypes = await repairTypeService.getRepairTypes();
-      return res.status(200).json(repairTypes);
+      return res.status(200).json({data:repairTypes});
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message });
