@@ -45,7 +45,7 @@ const Typeofchange = () => {
   ) => {
     setFormData((prev) => ({
       ...prev,
-      selectedMainPlace: e.target.value,
+      repairTypeTypeId: e.target.value,
     }));
   };
   const update = async () => {
@@ -99,12 +99,17 @@ const Typeofchange = () => {
       setRepairTypeTypes(response.data);
     });
   }, []);
+  useEffect(() => {
+    axios.get(`${API_URL}/repairTypeType`).then((response) => {
+      setTypes(response.data);
+    });
+  }, []);
   const openModalMainPalce = () => {
     setIsModalOpenMainPlace(true);
   };
   const closeModalMainPlace = () => {
     setIsModalOpenMainPlace(false);
-    axios.get(`${API_URL}/repairTypeType`).then((response) => {
+    axios.get(`${API_URL}/repairType`).then((response) => {
       setTypes(response.data);
     });
   };
@@ -133,11 +138,35 @@ const Typeofchange = () => {
     setIsModalOpen(false);
     setSelectedId(null);
   };
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${API_URL}/repairType/`, formData);
+      if (response.data) {
+        setTypes((prevEquipmentTypes) => [
+          ...prevEquipmentTypes,
+          response.data, // Add the newly created equipment type
+        ]);
+        setFormData({
+            name: "",
+            repairTypeTypeId: "",
+            description: "",
+        });
+        // If the response status is 201 (Created), show a notification
+        setNotification("شخص با موفقیت ساخته شد");
+      } else {
+        setNotification("یک ارور ناشناخته از سرور.");
+      }
+    } catch (error) {
+      setNotification("Error creating Equipment Type. Please try again.");
+      console.error("Error:", error);
+    }
+  };
   return (
     <React.Fragment>
       <div className="card mt-10">
         <div className="card-body">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2">
               <div className="flex  items-center gap-2">
                 <div className="flex flex-col items-center">
@@ -166,9 +195,9 @@ const Typeofchange = () => {
                       className="form-input  border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                     >
                       <option value="">Select a main place</option>
-                      {repairTypetypes.map((place) => (
-                        <option key={place.id} value={place.id}>
-                          {place.typeName}
+                      {repairTypetypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.typeName}
                         </option>
                       ))}
                     </select>
